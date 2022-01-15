@@ -2,4 +2,4 @@
 
 `[låset]`
 
-A bit of [https://github.com/ory/kratos-selfservice-ui-node] and [https://github.com/ory/hydra-login-consent-node].
+A bit of [https://github.com/ory/kratos-selfservice-ui-node](https://github.com/ory/kratos-selfservice-ui-node) and [https://github.com/ory/hydra-login-consent-node](https://github.com/ory/hydra-login-consent-node).
