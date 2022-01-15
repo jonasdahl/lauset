@@ -25,3 +25,13 @@ if (process.env.KRATOS_PUBLIC_URL) {
 }
 
 export const orySdk = sdk;
+
+export function getUrlForFlow(flow: string, query?: URLSearchParams) {
+  return `${removeTrailingSlash(apiBaseUrl)}/self-service/${flow}/browser${
+    query ? `?${query.toString()}` : ""
+  }`;
+}
+
+function removeTrailingSlash(s: string) {
+  return s.replace(/\/$/, "");
+}
