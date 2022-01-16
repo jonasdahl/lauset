@@ -17,37 +17,23 @@ import {
   SelfServiceRegistrationFlow,
   UiNode,
   UiNodeInputAttributes,
+  UiNodeMeta, UiText
 } from "@ory/client";
-import { UiNodeMeta, UiText } from "@ory/kratos-client";
 import { json, LoaderFunction, redirect, useLoaderData } from "remix";
-import { getUrlForFlow, orySdk } from "~/utils/ory.server";
-
-type LoaderData = { flow: SelfServiceRegistrationFlow };
+import { getUrlForKratosFlow, kratosSdk } from "~/utils/ory.server";
+import { getFlow, responseOnSoftError } from "~/utils/flow";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const params = new URL(request.url).searchParams;
-  const flow = params.get("flow");
-  console.log({ flow });
-  if (!flow) {
-    return redirect(
-      getUrlForFlow(
-        "registration",
-        new URLSearchParams({
-          return_to: "", // "http://localhost:3000/sign-up"
-        })
-      ),
-      { status: 303 }
-    );
+  const [flow, response] = getFlow(request, "registration")
+  if(!flow) {
+    return response
+  } else {
+    return kratosSdk.getSelfServiceRegistrationFlow(flow, request.headers.get("Cookie")!).then(r => r.data).catch(r => responseOnSoftError(r, response))
   }
-  const { data, headers } = await orySdk.getSelfServiceRegistrationFlow(
-    flow,
-    request.headers.get("Cookie") ?? undefined
-  );
-  return json<LoaderData>({ flow: data }, { headers });
 };
 
 export default function SignUp() {
-  const { flow } = useLoaderData<LoaderData>();
+  const flow = useLoaderData<SelfServiceRegistrationFlow>();
   console.log(flow);
   return (
     <Container py={7}>

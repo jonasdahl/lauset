@@ -1,7 +1,7 @@
 import { Code } from "@chakra-ui/react";
 import { SelfServiceError } from "@ory/kratos-client";
 import { json, LoaderFunction, redirect, useLoaderData } from "remix";
-import { orySdk } from "~/utils/ory.server";
+import { kratosSdk } from "~/utils/ory.server";
 
 type LoaderData = SelfServiceError;
 
@@ -10,7 +10,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (!id) {
     return redirect("/");
   }
-  const error = await orySdk.getSelfServiceError(id);
+  const error = await kratosSdk.getSelfServiceError(id);
   return json<LoaderData>(error.data, {
     status: error.status,
     statusText: error.statusText,
