@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import { LoaderFunction, redirect } from "remix";
 
 export const loader: LoaderFunction = () => {

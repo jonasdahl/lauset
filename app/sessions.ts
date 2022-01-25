@@ -15,7 +15,7 @@ const { getSession, commitSession, destroySession } =
       // sameSite: "lax",
       // secrets: ["s3cret1"],
       // secure: true
-    }
+    },
   });
 
 export { getSession, commitSession, destroySession };

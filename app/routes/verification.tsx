@@ -1,19 +1,23 @@
+import { Link } from ".pnpm/react-router-dom@6.2.1_react-dom@17.0.2+react@17.0.2/node_modules/react-router-dom";
 import { SelfServiceVerificationFlow } from "@ory/kratos-client";
-import { LoaderFunction, redirect, useLoaderData } from "remix"
-import { getUrlForKratosFlow, kratosBrowserUrl, kratosSdk } from "~/utils/ory.server";
-import { getFlow, responseOnSoftError } from "~/utils/flow";
+import { LoaderFunction, useLoaderData } from "remix";
+import { BasicUI } from "~/components/BasicUI";
+import { getQueryParameterFlow } from "~/utils/flow";
+import { kratosSdk } from "~/utils/ory.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const [flow, response] = getFlow(request, "verification")
-  if(!flow) {
-    return response
-  } else {
-    return kratosSdk.getSelfServiceVerificationFlow(flow, request.headers.get("Cookie")!).then(r => r.data).catch(r => responseOnSoftError(r, response))
-  }
-}
+  return getQueryParameterFlow(request, "verification", (flow, cookie) =>
+    kratosSdk.getSelfServiceVerificationFlow(flow, cookie)
+  );
+};
 
 export default function Verification() {
-  const data = useLoaderData<SelfServiceVerificationFlow>()
-  // TODO: ui
-  return <></>
+  const data = useLoaderData<SelfServiceVerificationFlow>();
+  return (
+    <BasicUI
+      ui={data.ui}
+      heading="Verification"
+      footer={<Link to="/">Go back</Link>}
+    />
+  );
 }

@@ -2,7 +2,7 @@ import { Button } from "@chakra-ui/react";
 import { ComponentProps } from "react";
 import { Link } from "remix";
 
-export function LinkButton({
+export function UIScreenButton({
   to,
   ...props
 }: { to: string } & ComponentProps<typeof Button>) {

@@ -1,19 +1,23 @@
+import { Link } from ".pnpm/react-router-dom@6.2.1_react-dom@17.0.2+react@17.0.2/node_modules/react-router-dom";
 import { SelfServiceRecoveryFlow } from "@ory/kratos-client";
-import { LoaderFunction, useLoaderData } from "remix"
+import { LoaderFunction, useLoaderData } from "remix";
+import { BasicUI } from "~/components/BasicUI";
+import { getQueryParameterFlow } from "~/utils/flow";
 import { kratosSdk } from "~/utils/ory.server";
-import { getFlow, responseOnSoftError } from "~/utils/flow";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const [flow, response] = getFlow(request, "recovery")
-  if(!flow) {
-    return response
-  } else {
-    return kratosSdk.getSelfServiceRecoveryFlow(flow, request.headers.get("Cookie")!).then(r => r.data).catch(r => responseOnSoftError(r, response))
-  }
-}
+  return getQueryParameterFlow(request, "recovery", (flow, cookie) =>
+    kratosSdk.getSelfServiceRecoveryFlow(flow, cookie)
+  );
+};
 
 export default function Recovery() {
-  const data = useLoaderData<SelfServiceRecoveryFlow>()
-  // TODO: ui
-  return <></>
+  const data = useLoaderData<SelfServiceRecoveryFlow>();
+  return (
+    <BasicUI
+      ui={data.ui}
+      heading="Recovery"
+      footer={<Link to="/login">Go Back</Link>}
+    />
+  );
 }

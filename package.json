@@ -16,6 +16,7 @@
     "@emotion/styled": "^11.6.0",
     "@ory/client": "^0.0.1-alpha.46",
     "@ory/hydra-client": "^1.10.6",
+    "@ory/integrations": "^0.2.1",
     "@ory/kratos-client": "^0.8.2-alpha.1",
     "@remix-run/react": "^1.1.1",
     "@remix-run/serve": "^1.1.1",
