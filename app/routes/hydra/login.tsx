@@ -1,4 +1,3 @@
-import { AcceptLoginRequest } from "@ory/hydra-client";
 import crypto from "crypto";
 import { LoaderFunction, redirect } from "remix";
 import { commitSession, getSession } from "~/sessions";
@@ -24,18 +23,13 @@ export const loader: LoaderFunction = async ({ request }) => {
     // You can apply logic here, for example update the number of times the user logged in...
     // Now it's time to grant the login kratosRequest. You could also deny the kratosRequest if something went terribly wrong
     // (e.g. your arch-enemy logging in...)
-    const acceptLoginRequest = {} as AcceptLoginRequest;
-    acceptLoginRequest.subject = String(data.subject);
-
-    console.debug(
-      "Accepting ORY Hydra Login Request because skip is true",
-      acceptLoginRequest
-    );
+    console.debug("Accepting ORY Hydra Login Request because skip is true");
+    const { data: body } = await hydraAdmin.acceptLoginRequest(hydraChallenge, {
+      subject: data.subject,
+    });
 
     // All we need to do now is to redirect the user back to hydra!
-    return hydraAdmin
-      .acceptLoginRequest(hydraChallenge, acceptLoginRequest)
-      .then(({ data: body }) => redirect(String(body.redirect_to)));
+    return redirect(body.redirect_to);
   }
 
   const hydraLoginState = params.get("hydra_login_state");
@@ -60,22 +54,18 @@ export const loader: LoaderFunction = async ({ request }) => {
       undefined,
       request.headers.get("Cookie")!
     );
-    // We need to get the email of the user. We don't want to do that via traits as
-    // they are dynamic. They would be part of the PublicAPI. That's not true
-    // for identity.addresses So let's get it via the AdmninAPI
-    const subject = userInfo.identity.id;
 
     // User is authenticated, accept the LoginRequest and tell Hydra
-    let acceptLoginRequest: AcceptLoginRequest = {} as AcceptLoginRequest;
-    acceptLoginRequest.subject = subject;
-    acceptLoginRequest.context = userInfo;
+    const loginResponse = await hydraAdmin.acceptLoginRequest(hydraChallenge, {
+      // We need to get the email of the user. We don't want to do that via traits as
+      // they are dynamic. They would be part of the PublicAPI. That's not true
+      // for identity.addresses So let's get it via the AdmninAPI
+      subject: userInfo.identity.id,
+      context: userInfo,
+    });
 
     // All we need to do now is to redirect the user back to hydra!
-    const loginResponse = await hydraAdmin.acceptLoginRequest(
-      hydraChallenge,
-      acceptLoginRequest
-    );
-    return redirect(String(loginResponse.data.redirect_to));
+    return redirect(loginResponse.data.redirect_to);
   } catch (e: any) {
     if (e.response && e.response.status === 403) {
       return redirect(
@@ -111,32 +101,21 @@ async function redirectToLogin(request: Request) {
 
   session.set("hydraLoginState", state);
 
-  const configBaseUrl =
-    process.env.BASE_URL && process.env.BASE_URL != "/"
-      ? process.env.BASE_URL
-      : "";
-  const baseUrl =
-    configBaseUrl ||
-    `${new URL(request.url).protocol}://${request.headers.get("host")}`;
-  const returnTo = new URL(request.url, baseUrl);
-  returnTo.searchParams.set("hydra_login_state", state);
-  console.debug(`returnTo: "${returnTo.toString()}"`, returnTo);
+  const return_to = new URL(request.url);
+  return_to.searchParams.set("hydra_login_state", state);
 
-  console.debug("new URL: ", [
-    kratosBrowserUrl + "/self-service/login/browser",
-    baseUrl,
-  ]);
-
-  const redirectTo = new URL(
-    kratosBrowserUrl + "/self-service/login/browser",
-    baseUrl
+  const redirect_to = getUrlForKratosFlow(
+    kratosBrowserUrl,
+    "login",
+    new URLSearchParams({
+      return_to: return_to.toString(),
+      refresh: "true",
+    })
   );
-  redirectTo.searchParams.set("refresh", "true");
-  redirectTo.searchParams.set("return_to", returnTo.toString());
 
-  console.debug(`redirectTo: "${redirectTo.toString()}"`, redirectTo);
+  console.debug("redirecting to login", { redirect_to, return_to });
 
-  return redirect(redirectTo.toString(), {
+  return redirect(redirect_to, {
     headers: {
       "Set-Cookie": await commitSession(session),
     },

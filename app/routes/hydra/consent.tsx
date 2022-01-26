@@ -1,7 +1,21 @@
-import { AcceptConsentRequest, RejectRequest } from "@ory/hydra-client";
+import { Container, Heading, Image, Stack } from "@chakra-ui/react";
+import { OAuth2Client } from "@ory/hydra-client";
 import { Session } from "@ory/kratos-client";
-import { ActionFunction, LoaderFunction, redirect } from "remix";
+import {
+  ActionFunction,
+  Form,
+  LoaderFunction,
+  redirect,
+  useLoaderData,
+} from "remix";
 import { hydraAdmin } from "~/utils/ory.server";
+
+type ViewData = {
+  challenge: string;
+  requested_scope: string[];
+  user: string;
+  client: OAuth2Client;
+};
 
 export const loader: LoaderFunction = async ({ request }) => {
   const params = new URL(request.url).searchParams;
@@ -18,28 +32,23 @@ export const loader: LoaderFunction = async ({ request }) => {
   // If a user has granted this application the requested scope, hydra will tell us to not show the UI.
   if (body.skip) {
     // You can apply logic here, for example grant another scope, or do whatever...
-
-    // Now it's time to grant the consent request. You could also deny the request if something went terribly wrong
-    const acceptConsentRequest = {} as AcceptConsentRequest;
-
-    // We can grant all scopes that have been requested - hydra already checked for us that no additional scopes
-    // are requested accidentally.
-    acceptConsentRequest.grant_scope = body.requested_scope;
-
-    // ORY Hydra checks if requested audiences are allowed by the client, so we can simply echo this.
-    acceptConsentRequest.grant_access_token_audience =
-      body.requested_access_token_audience;
-
-    // The session allows us to set session data for id and access tokens. Let's add the email if it is included.
-    acceptConsentRequest.session = createHydraSession(
-      body.requested_scope,
-      body.context as Session
-    );
-
     // All we need to do now is to redirect the user back to hydra!
     const {
       data: { redirect_to },
-    } = await hydraAdmin.acceptConsentRequest(challenge, acceptConsentRequest);
+    } = await hydraAdmin.acceptConsentRequest(challenge, {
+      // We can grant all scopes that have been requested - hydra already checked for us that no additional scopes
+      // are requested accidentally.
+      grant_scope: body.requested_scope,
+
+      // ORY Hydra checks if requested audiences are allowed by the client, so we can simply echo this.
+      grant_access_token_audience: body.requested_access_token_audience,
+
+      // The session allows us to set session data for id and access tokens. Let's add the email if it is included.
+      session: createHydraSession(
+        body.requested_scope,
+        body.context as Session
+      ),
+    });
     return redirect(redirect_to);
   }
 
@@ -51,12 +60,13 @@ export const loader: LoaderFunction = async ({ request }) => {
     requested_scope: body.requested_scope,
     user: body.subject,
     client: body.client,
-  };
+  } as ViewData;
 };
 
 export const action: ActionFunction = async ({ request }) => {
   const form = await request.formData();
   const challenge = form.get("challenge")?.toString();
+  console.debug(challenge);
 
   if (!challenge) {
     throw new Error("missing challenge in consent action");
@@ -65,19 +75,16 @@ export const action: ActionFunction = async ({ request }) => {
   // Let's see if the user decided to accept or reject the consent request..
   if (form.get("submit") !== "Allow access") {
     // Looks like the consent request was denied by the user
-    const rejectConsentRequest = {} as RejectRequest;
-
-    rejectConsentRequest.error = "access_denied";
-    rejectConsentRequest.error_description =
-      "The resource owner denied the request";
-
     const {
       data: { redirect_to },
-    } = await hydraAdmin.rejectConsentRequest(challenge, rejectConsentRequest);
+    } = await hydraAdmin.rejectConsentRequest(challenge, {
+      error: "access_denied",
+      error_description: "The resource owner denied the request",
+    });
     return redirect(redirect_to);
   }
 
-  let grantScope: any = form.get("grant_scope");
+  let grantScope = form.get("grant_scope") as string | string[] | null;
   console.debug(grantScope);
   if (!grantScope) {
     throw new Error("missing grant_scope in consent action");
@@ -89,31 +96,26 @@ export const action: ActionFunction = async ({ request }) => {
   // Seems like the user authenticated! Let's tell hydra...
   const { data: body } = await hydraAdmin.getConsentRequest(challenge);
 
-  const acceptConsentRequest = {} as AcceptConsentRequest;
-  // We can grant all scopes that have been requested - hydra already checked for us that no additional scopes
-  // are requested accidentally.
-  acceptConsentRequest.grant_scope = grantScope;
-
-  // ORY Hydra checks if requested audiences are allowed by the client, so we can simply echo this.
-  acceptConsentRequest.grant_access_token_audience =
-    body.requested_access_token_audience;
-
-  // This tells hydra to remember this consent request and allow the same client to request the same
-  // scopes from the same user, without showing the UI, in the future.
-  acceptConsentRequest.remember = Boolean(form.get("remember"));
-
-  // When this "remember" sesion expires, in seconds. Set this to 0 so it will never expire.
-  acceptConsentRequest.remember_for = 3600;
-
-  // The session allows us to set session data for id and access tokens. Let's add the email if it is included.
-  acceptConsentRequest.session = createHydraSession(
-    body.requested_scope,
-    body.context as Session
-  );
-
   const {
     data: { redirect_to },
-  } = await hydraAdmin.acceptConsentRequest(challenge, acceptConsentRequest);
+  } = await hydraAdmin.acceptConsentRequest(challenge, {
+    // We can grant all scopes that have been requested - hydra already checked for us that no additional scopes
+    // are requested accidentally.
+    grant_scope: grantScope,
+
+    // ORY Hydra checks if requested audiences are allowed by the client, so we can simply echo this.
+    grant_access_token_audience: body.requested_access_token_audience,
+
+    // This tells hydra to remember this consent request and allow the same client to request the same
+    // scopes from the same user, without showing the UI, in the future.
+    remember: Boolean(form.get("remember")),
+
+    // When this "remember" sesion expires, in seconds. Set this to 0 so it will never expire.
+    remember_for: 3600,
+
+    // The session allows us to set session data for id and access tokens. Let's add the email if it is included.
+    session: createHydraSession(body.requested_scope, body.context as Session),
+  });
 
   // All we need to do now is to redirect the user back to hydra!
   return redirect(redirect_to);
@@ -145,5 +147,69 @@ const createHydraSession = (
 };
 
 export default function Consent() {
-  return <></>;
+  const { client, user, requested_scope } = useLoaderData<ViewData>();
+  return (
+    <Container>
+      <Stack>
+        <Heading>An application requests access to your data!</Heading>
+        <Form action="/consent" method="post">
+          {client.logo_uri && <Image src={client.logo_uri} />}
+          <p>
+            Hi {user}, application{" "}
+            <strong>{client.client_name ?? client.client_id}</strong> wants
+            access resources on your behalf and to:
+          </p>
+          {requested_scope.map((scope) => (
+            <>
+              <input
+                type="checkbox"
+                name="grant_scope"
+                id={scope}
+                value={scope}
+              />
+              <label htmlFor={scope}>{scope}</label>
+              <br />
+            </>
+          ))}
+
+          <p>
+            Do you want to be asked next time when this application wants to
+            access your data? The application will not be able to ask for more
+            permissions without your consent.
+          </p>
+
+          <ul>
+            {client.policy_uri && (
+              <li>
+                <a href={client.policy_uri}>Policy</a>
+              </li>
+            )}
+            {client.tos_uri && (
+              <li>
+                <a href={client.tos_uri}>Terms of Service</a>
+              </li>
+            )}
+          </ul>
+
+          <p>
+            <input type="checkbox" name="remember" id="remember" value="1" />
+            <label htmlFor="remember">Do not ask me again</label>
+
+            <input
+              type="submit"
+              name="submit"
+              id="accept"
+              value="Allow access"
+            />
+            <input
+              type="submit"
+              name="submit"
+              id="reject"
+              value="Deny access"
+            />
+          </p>
+        </Form>
+      </Stack>
+    </Container>
+  );
 }
