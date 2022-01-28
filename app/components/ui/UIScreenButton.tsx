@@ -1,10 +1,20 @@
 import { Button } from "@chakra-ui/react";
-import { ComponentProps } from "react";
+import { ComponentProps, forwardRef } from "react";
 import { Link } from "remix";
 
-export function UIScreenButton({
-  to,
-  ...props
-}: { to: string } & ComponentProps<typeof Button>) {
-  return <Button as={(props) => <Link to={to} {...props} />} {...props} />;
+export function UIScreenButton(
+  props: ComponentProps<typeof Link> & ComponentProps<typeof Button>
+) {
+  return (
+    <Button
+      as={forwardRef((props, ref) =>
+        props.to.startsWith("http") ? (
+          <a {...props} ref={ref} />
+        ) : (
+          <Link {...props} ref={ref} />
+        )
+      )}
+      {...props}
+    />
+  );
 }

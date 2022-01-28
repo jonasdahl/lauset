@@ -1,0 +1,28 @@
+serve:
+  public:
+    port: 4444
+  admin:
+    port: 4445
+
+urls:
+  self:
+    issuer: "http://localhost:4444"
+    public: "http://localhost:4444"
+  consent: "http://localhost:3000/hydra/consent"
+  login: "http://localhost:3000/hydra/login"
+  logout: "http://localhost:3000/logout"
+
+secrets:
+  system:
+    - NGc0QTY2Sk14NWpuTFZvN0p4ZFVmZlNQYzFpUk9wVkY=
+  cookie:
+    - bHZPQUphY1o3WWNyN2RBMUprRnpxWU5HRmZrWmhpRTI=
+
+
+oidc:
+  subject_identifiers:
+    supported_types:
+      - pairwise
+      - public
+    pairwise:
+      salt: youReallyNeedToChangeThis

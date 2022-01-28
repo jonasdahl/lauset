@@ -1,4 +1,3 @@
-import { Link } from ".pnpm/react-router-dom@6.2.1_react-dom@17.0.2+react@17.0.2/node_modules/react-router-dom";
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import { SelfServiceLoginFlow } from "@ory/kratos-client";
 import { LoaderFunction, useLoaderData } from "remix";
@@ -71,7 +70,7 @@ export default function Login() {
 
         {data.isAuthenticated ? (
           <>
-            <Link to={data.logout_url}>Log out</Link>
+            <a href={data.logout_url}>Log out</a>
           </>
         ) : (
           <>

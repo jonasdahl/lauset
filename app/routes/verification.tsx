@@ -1,6 +1,5 @@
-import { Link } from ".pnpm/react-router-dom@6.2.1_react-dom@17.0.2+react@17.0.2/node_modules/react-router-dom";
 import { SelfServiceVerificationFlow } from "@ory/kratos-client";
-import { LoaderFunction, useLoaderData } from "remix";
+import { Link, LoaderFunction, useLoaderData } from "remix";
 import { BasicUI } from "~/components/BasicUI";
 import { getQueryParameterFlow } from "~/utils/flow";
 import { kratosSdk } from "~/utils/ory.server";

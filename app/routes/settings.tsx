@@ -24,20 +24,32 @@ export default function Verification() {
         <UIForm
           ui={data.ui}
           only={["profile"]}
-          before={<Heading as="h3">Profile Settings</Heading>}
+          before={
+            <Heading as="h3" fontSize="xl">
+              Profile Settings
+            </Heading>
+          }
           showEmpty
         />
 
         <UIForm
           ui={data.ui}
           only={["password"]}
-          before={<Heading as="h3">Change password</Heading>}
+          before={
+            <Heading as="h3" fontSize="xl">
+              Change password
+            </Heading>
+          }
         />
 
         <UIForm
           ui={data.ui}
           only={["oidc"]}
-          before={<Heading as="h3">Manage Social Sign In</Heading>}
+          before={
+            <Heading as="h3" fontSize="xl">
+              Manage Social Sign In
+            </Heading>
+          }
         />
 
         <UIForm
@@ -45,7 +57,9 @@ export default function Verification() {
           only={["lookup_secret"]}
           before={
             <>
-              <Heading as="h3">Manage 2FA Backup Recovery Codes</Heading>
+              <Heading as="h3" fontSize="xl">
+                Manage 2FA Backup Recovery Codes
+              </Heading>
               <p>
                 Recovery codes can be used in panic situations where you have
                 lost access to your 2FA device.
@@ -59,7 +73,9 @@ export default function Verification() {
           only={["totp"]}
           before={
             <>
-              <Heading as="h3">Manage 2FA TOTP Authenticator App</Heading>
+              <Heading as="h3" fontSize="xl">
+                Manage 2FA TOTP Authenticator App
+              </Heading>
               <p>
                 Add a TOTP Authenticator App to your account to improve your
                 account security. Popular Authenticator Apps are{" "}
@@ -91,7 +107,9 @@ export default function Verification() {
           only={["webauthn"]}
           before={
             <>
-              <Heading as="h3">Manage Hardware Tokens and Biometrics</Heading>
+              <Heading as="h3" fontSize="xl">
+                Manage Hardware Tokens and Biometrics
+              </Heading>
               <p>
                 Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID,
                 TouchID) to enhance your account security.

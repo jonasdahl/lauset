@@ -7,7 +7,9 @@ export function Messages({ messages }: { messages?: UiText[] }) {
   return (
     <UnorderedList>
       {messages?.map((m) => (
-        <ListItem className="message">{m.text}</ListItem>
+        <ListItem key={m.id} className="message">
+          {m.text}
+        </ListItem>
       ))}
     </UnorderedList>
   );

@@ -113,7 +113,10 @@ async function redirectToLogin(request: Request) {
     })
   );
 
-  console.debug("redirecting to login", { redirect_to, return_to });
+  console.debug("redirecting to login", {
+    redirect_to,
+    return_to: return_to.toString(),
+  });
 
   return redirect(redirect_to, {
     headers: {

@@ -1,13 +1,12 @@
 import {
-  Configuration as KratosConfiguration,
-  V0alpha2Api,
-} from "@ory/kratos-client";
-import {
   AdminApi,
   Configuration as HydraConfiguration,
 } from "@ory/hydra-client";
+import {
+  Configuration as KratosConfiguration,
+  V0alpha2Api,
+} from "@ory/kratos-client";
 
-// Taken from https://github.com/ory/kratos-selfservice-ui-node/blob/29b716c0b866dd70c9f6d7db5aa79b33b0242947/src/pkg/sdk/index.ts
 export const kratosPublicUrl = process.env.KRATOS_PUBLIC_URL!;
 export const kratosBrowserUrl = process.env.KRATOS_BROWSER_URL!;
 

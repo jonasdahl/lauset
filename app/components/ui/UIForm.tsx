@@ -8,7 +8,7 @@ import {
   isUiNodeTextAttributes,
 } from "@ory/integrations/ui";
 import { UiContainer } from "@ory/kratos-client";
-import { Form, FormMethod } from "remix";
+import { FormMethod } from "remix";
 import { UINodeAnchor } from "./UINodeAnchor";
 import { UINodeImage } from "./UINodeImage";
 import { UINodeInputButton } from "./UINodeInputButton";
@@ -31,45 +31,84 @@ export function UIForm({
   after?: JSX.Element;
   showEmpty?: boolean;
 }) {
+  const exists = filterNodesByGroups(ui.nodes, only, true).length > 0;
+  if (!exists && !showEmpty) {
+    return null;
+  }
+
   const nodes = filterNodesByGroups(ui.nodes, only).map((node) => {
     const { attributes, ...rest } = node;
     if (isUiNodeAnchorAttributes(attributes)) {
-      return <UINodeAnchor {...{ attributes, ...rest }} />;
+      return (
+        <UINodeAnchor key={attributes.id} attributes={attributes} {...rest} />
+      );
     } else if (isUiNodeImageAttributes(attributes)) {
-      return <UINodeImage {...{ attributes, ...rest }} />;
+      return (
+        <UINodeImage key={attributes.id} attributes={attributes} {...rest} />
+      );
     } else if (isUiNodeInputAttributes(attributes)) {
       switch (attributes.type) {
         case "hidden":
-          return <UINodeInputHidden {...{ attributes, ...rest }} />;
+          return (
+            <UINodeInputHidden
+              key={attributes.name}
+              attributes={attributes}
+              {...rest}
+            />
+          );
         case "submit":
-          return <UINodeInputButton {...{ attributes, ...rest }} />;
+          return (
+            <UINodeInputButton
+              key={attributes.name}
+              attributes={attributes}
+              {...rest}
+            />
+          );
         case "button":
-          return <UINodeInputButton {...{ attributes, ...rest }} />;
+          return (
+            <UINodeInputButton
+              key={attributes.name}
+              attributes={attributes}
+              {...rest}
+            />
+          );
         case "checkbox":
-          return <UINodeInputCheckbox {...{ attributes, ...rest }} />;
+          return (
+            <UINodeInputCheckbox
+              key={attributes.name}
+              attributes={attributes}
+              {...rest}
+            />
+          );
         default:
-          return <UINodeInputDefault {...{ attributes, ...rest }} />;
+          return (
+            <UINodeInputDefault
+              key={attributes.name}
+              attributes={attributes}
+              {...rest}
+            />
+          );
       }
     } else if (isUiNodeScriptAttributes(attributes)) {
-      return <UINodeScript {...{ attributes, ...rest }} />;
+      return (
+        <UINodeScript key={attributes.id} attributes={attributes} {...rest} />
+      );
     } else if (isUiNodeTextAttributes(attributes)) {
-      return <UINodeText {...{ attributes, ...rest }} />;
+      return (
+        <UINodeText key={attributes.id} attributes={attributes} {...rest} />
+      );
     }
 
-    return <UINodeInputDefault {...{ attributes, ...rest }} />;
+    return <UINodeInputDefault attributes={attributes} {...rest} />;
   });
 
-  if (nodes.length || showEmpty) {
-    return (
-      <Form action={ui.action} method={ui.method as FormMethod}>
-        <Stack>
-          {before}
-          {nodes}
-          {after}
-        </Stack>
-      </Form>
-    );
-  } else {
-    return null;
-  }
+  return (
+    <form action={ui.action} method={ui.method as FormMethod}>
+      <Stack>
+        {before}
+        {nodes}
+        {after}
+      </Stack>
+    </form>
+  );
 }

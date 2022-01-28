@@ -6,6 +6,11 @@ export function UINodeInputHidden(
 ) {
   const { attributes, messages } = props;
   return (
-    <Input name={attributes.name} type="hidden" value={attributes.value} />
+    <Input
+      name={attributes.name}
+      type="hidden"
+      value={attributes.value}
+      readOnly
+    />
   );
 }

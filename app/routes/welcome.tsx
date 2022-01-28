@@ -11,7 +11,16 @@ export const loader: LoaderFunction = async ({ request }) => {
     .createSelfServiceLogoutFlowUrlForBrowsers(cookie)
     .then((r) => r.data)
     .catch(() => ({ logout_url: "" }));
-  const { data: userInfo } = await kratosSdk.toSession(undefined, cookie);
+
+  let userInfo: Session | null = null;
+  if (cookie?.includes("session")) {
+    const { data } = await kratosSdk.toSession(undefined, cookie).catch((e) => {
+      console.debug("failed to get session", e);
+      return { data: null };
+    });
+
+    userInfo = data;
+  }
   // const session = await getSession(cookie)
   return { logout_url, userInfo };
 };
@@ -35,20 +44,20 @@ export default function Welcome() {
           </pre>
         </div>
         <Stack>
-          <UIScreenButton disabled={!userInfo} to="/login">
+          <UIScreenButton to="/login" disabled={!!userInfo}>
             Sign in
           </UIScreenButton>
-          <UIScreenButton disabled={!userInfo} to="/sign-up">
+          <UIScreenButton to="/registration" disabled={!!userInfo}>
             Sign up
           </UIScreenButton>
-          <UIScreenButton disabled={!userInfo} to="/recover-account">
+          <UIScreenButton to="/recovery" disabled={!userInfo}>
             Recover account
           </UIScreenButton>
-          <UIScreenButton to="/verify-account">Verify account</UIScreenButton>
-          <UIScreenButton disabled={!!userInfo} to="/account-settings">
+          <UIScreenButton to="/verification">Verify account</UIScreenButton>
+          <UIScreenButton to="/settings" disabled={!userInfo}>
             Account settings
           </UIScreenButton>
-          <UIScreenButton disabled={!!userInfo} to={logout_url}>
+          <UIScreenButton to={logout_url} disabled={!userInfo}>
             Logout
           </UIScreenButton>
         </Stack>

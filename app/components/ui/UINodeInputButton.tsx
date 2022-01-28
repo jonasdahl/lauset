@@ -7,10 +7,15 @@ export function UINodeInputButton(
   props: { attributes: UiNodeInputAttributes } & UiNode
 ) {
   const { attributes, messages } = props;
+  if (attributes.onclick) {
+    console.error(
+      "button onclick string, what should i do with this?",
+      attributes.onclick
+    );
+  }
   return (
     <>
       <Button
-        onclick={attributes.onclick}
         name={attributes.name}
         type={attributes.type as "button" | "submit" | "reset"}
         value={attributes.value}

@@ -66,7 +66,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 export const action: ActionFunction = async ({ request }) => {
   const form = await request.formData();
   const challenge = form.get("challenge")?.toString();
-  console.debug(challenge);
 
   if (!challenge) {
     throw new Error("missing challenge in consent action");
@@ -84,13 +83,9 @@ export const action: ActionFunction = async ({ request }) => {
     return redirect(redirect_to);
   }
 
-  let grantScope = form.get("grant_scope") as string | string[] | null;
-  console.debug(grantScope);
-  if (!grantScope) {
+  let grantScope = form.getAll("grant_scope") as string[] | null;
+  if (!grantScope || grantScope.length === 0) {
     throw new Error("missing grant_scope in consent action");
-  }
-  if (!Array.isArray(grantScope)) {
-    grantScope = [grantScope];
   }
 
   // Seems like the user authenticated! Let's tell hydra...
@@ -121,6 +116,48 @@ export const action: ActionFunction = async ({ request }) => {
   return redirect(redirect_to);
 };
 
+/*
+{
+  id: '41398353-419f-4bb9-b2c2-e2a06c51124d',
+  active: true,
+  expires_at: '2022-01-29T21:05:35.402963711Z',
+  authenticated_at: '2022-01-28T21:05:35.402963711Z',
+  authenticator_assurance_level: 'aal1',
+  authentication_methods: [
+    {
+      method: 'password',
+      completed_at: '2022-01-28T20:53:00.664152109Z'
+    },
+    {
+      method: 'password',
+      completed_at: '2022-01-28T21:05:35.402961808Z'
+    }
+  ],
+  issued_at: '2022-01-28T21:05:35.402963711Z',
+  identity: {
+    id: 'ccb7f3ad-6547-4e9a-be44-08be31c279c0',
+    schema_id: 'default',
+    schema_url: 'http://localhost:4433/schemas/default',
+    state: 'active',
+    state_changed_at: '2022-01-28T18:15:47.82151471Z',
+    traits: { email: 'andreas@addem.se', name: [Object] },
+    verifiable_addresses: [ {
+      id: 'c17a9686-bebf-4df2-ba87-5d6acc9424a7',
+      value: 'andreas@addem.se',
+      verified: true,
+      via: 'email',
+      status: 'completed',
+      verified_at: '2022-01-28T18:16:11.354904678Z',
+      created_at: '2022-01-28T18:15:47.823652Z',
+      updated_at: '2022-01-28T18:15:47.823652Z'
+    } ],
+    recovery_addresses: [ [Object] ],
+    created_at: '2022-01-28T18:15:47.82292Z',
+    updated_at: '2022-01-28T18:15:47.82292Z'
+  }
+}
+*/
+
 const createHydraSession = (
   requestedScope: string[] = [],
   context: Session
@@ -130,9 +167,12 @@ const createHydraSession = (
     requestedScope.indexOf("email") === -1 ||
     verifiableAddresses.length === 0
   ) {
-    return {};
+    return {
+      id_token: {},
+    };
   }
 
+  console.debug("existing");
   return {
     // This data will be available when introspecting the token. Try to avoid sensitive information here,
     // unless you limit who can introspect tokens. (Therefore the scope-check above)
@@ -141,18 +181,20 @@ const createHydraSession = (
     // This data will be available in the ID token.
     // Most services need email-addresses, so let's include that.
     id_token: {
-      email: verifiableAddresses[0].value as Object, // FIXME Small typescript workaround caused by a bug in Go-swagger
+      email: verifiableAddresses[0].value,
     },
   };
 };
 
 export default function Consent() {
-  const { client, user, requested_scope } = useLoaderData<ViewData>();
+  const { challenge, client, user, requested_scope } =
+    useLoaderData<ViewData>();
   return (
     <Container>
       <Stack>
         <Heading>An application requests access to your data!</Heading>
-        <Form action="/consent" method="post">
+        <Form action="/hydra/consent" method="post">
+          <input type="hidden" name="challenge" value={challenge} />
           {client.logo_uri && <Image src={client.logo_uri} />}
           <p>
             Hi {user}, application{" "}
@@ -160,7 +202,7 @@ export default function Consent() {
             access resources on your behalf and to:
           </p>
           {requested_scope.map((scope) => (
-            <>
+            <div key={scope}>
               <input
                 type="checkbox"
                 name="grant_scope"
@@ -169,7 +211,7 @@ export default function Consent() {
               />
               <label htmlFor={scope}>{scope}</label>
               <br />
-            </>
+            </div>
           ))}
 
           <p>

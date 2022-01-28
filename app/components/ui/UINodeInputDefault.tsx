@@ -18,7 +18,7 @@ export function UINodeInputDefault(
           name={attributes.name}
           id={attributes.name}
           type={attributes.type}
-          value="true"
+          defaultValue={attributes.value}
           placeholder={getNodeLabel(props)}
           disabled={attributes.disabled}
         />
