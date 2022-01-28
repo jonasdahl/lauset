@@ -1,3 +1,5 @@
+import { ChakraProvider } from "@chakra-ui/react";
+import type { MetaFunction } from "remix";
 import {
   Links,
   LiveReload,
@@ -6,8 +8,6 @@ import {
   Scripts,
   ScrollRestoration,
 } from "remix";
-import { ChakraProvider } from "@chakra-ui/react";
-import type { MetaFunction } from "remix";
 
 export const meta: MetaFunction = () => {
   return { title: "Authentication" };

@@ -3,11 +3,11 @@ import { getUrlForKratosFlow, kratosBrowserUrl } from "./ory.server";
 
 // TODO: https://github.com/ory/kratos-selfservice-ui-node/blob/153b6516497456b376ea5c24e6bfe023c965a982/src/pkg/middleware.ts
 
-export function getQueryParameterFlow<T>(
+export async function getFlowOrRedirectToInit<T>(
   request: Request,
   name: string,
   flowGetter: (flow: string, cookie: string) => Promise<{ data: T }>
-): Promise<T | Response> | Response {
+): Promise<T> {
   const params = new URL(request.url).searchParams;
   const flow = params.get("flow");
   const return_to = params.get("return_to") ?? "";
@@ -20,27 +20,22 @@ export function getQueryParameterFlow<T>(
   const initFlowResponse = redirect(initFlowUrl, 303);
 
   if (!flow) {
-    return initFlowResponse;
+    throw initFlowResponse;
   } else {
-    return flowGetter(flow, request.headers.get("Cookie")!)
-      .then((r) => r.data)
-      .catch((r) => responseOnSoftError(r, initFlowResponse));
-  }
-}
+    try {
+      const { data } = await flowGetter(flow, request.headers.get("Cookie")!);
+      return data;
+    } catch (e: any) {
+      if (
+        e.response &&
+        (e.response.status === 404 ||
+          e.response.status === 410 ||
+          e.response.status === 403)
+      ) {
+        throw initFlowResponse;
+      }
 
-function responseOnSoftError(
-  err: Error & { response?: { status: number } },
-  response: Response
-) {
-  if (!err.response) {
-    throw err;
-  } else if (
-    err.response.status === 404 ||
-    err.response.status === 410 ||
-    err.response.status === 403
-  ) {
-    return response;
-  } else {
-    throw err;
+      throw e;
+    }
   }
 }

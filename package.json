@@ -6,6 +6,7 @@
   "scripts": {
     "build": "remix build",
     "dev": "node -r dotenv/config node_modules/@remix-run/dev/cli.js dev",
+    "typecheck": "tsc -b",
     "postinstall": "remix setup node",
     "start": "remix-serve build"
   },

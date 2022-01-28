@@ -3,7 +3,7 @@ import { SelfServiceLoginFlow } from "@ory/kratos-client";
 import { LoaderFunction, useLoaderData } from "remix";
 import { UIForm } from "~/components/ui/UIForm";
 import { UIScreenButton } from "~/components/ui/UIScreenButton";
-import { getQueryParameterFlow } from "~/utils/flow";
+import { getFlowOrRedirectToInit } from "~/utils/flow";
 import {
   getUrlForKratosFlow,
   kratosBrowserUrl,
@@ -11,15 +11,11 @@ import {
 } from "~/utils/ory.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const loginOrResponse = await getQueryParameterFlow(
+  const login = await getFlowOrRedirectToInit(
     request,
     "login",
     (flow, cookie) => kratosSdk.getSelfServiceLoginFlow(flow, cookie)
   );
-
-  if (loginOrResponse instanceof Response) {
-    return loginOrResponse;
-  }
 
   const return_to = (
     new URL(request.url).searchParams.get("return_to") ?? ""
@@ -38,9 +34,8 @@ export const loader: LoaderFunction = async ({ request }) => {
       .catch(() => "")) ?? "";
 
   return {
-    ...loginOrResponse,
-    isAuthenticated:
-      loginOrResponse.refresh || loginOrResponse.requested_aal === "aal2",
+    ...login,
+    isAuthenticated: login.refresh || login.requested_aal === "aal2",
     register_url,
     logout_url,
   };

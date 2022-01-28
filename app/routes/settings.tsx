@@ -3,11 +3,11 @@ import { SelfServiceSettingsFlow } from "@ory/kratos-client";
 import { Link, LoaderFunction, useLoaderData } from "remix";
 import { Messages } from "~/components/messages";
 import { UIForm } from "~/components/ui/UIForm";
-import { getQueryParameterFlow } from "~/utils/flow";
+import { getFlowOrRedirectToInit } from "~/utils/flow";
 import { kratosSdk } from "~/utils/ory.server";
 
 export const loader: LoaderFunction = async ({ request }) => {
-  return getQueryParameterFlow(request, "settings", (flow, cookie) =>
+  return getFlowOrRedirectToInit(request, "settings", (flow, cookie) =>
     kratosSdk.getSelfServiceSettingsFlow(flow, undefined, cookie)
   );
 };

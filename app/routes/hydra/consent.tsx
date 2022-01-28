@@ -193,7 +193,7 @@ export default function Consent() {
     <Container>
       <Stack>
         <Heading>An application requests access to your data!</Heading>
-        <Form action="/hydra/consent" method="post">
+        <Form method="post">
           <input type="hidden" name="challenge" value={challenge} />
           {client.logo_uri && <Image src={client.logo_uri} />}
           <p>

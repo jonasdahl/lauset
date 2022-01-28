@@ -7,13 +7,13 @@ export function UIScreenButton(
 ) {
   return (
     <Button
-      as={forwardRef((props, ref) =>
-        props.to.startsWith("http") ? (
-          <a {...props} ref={ref} />
-        ) : (
-          <Link {...props} ref={ref} />
-        )
-      )}
+      as={forwardRef((props, ref) => (
+        <Link
+          reloadDocument={props.to.startsWith("http")}
+          {...props}
+          ref={ref}
+        />
+      ))}
       {...props}
     />
   );
