@@ -2,19 +2,14 @@ import { createCookieSessionStorage } from "remix";
 
 const { getSession, commitSession, destroySession } =
   createCookieSessionStorage({
-    // a Cookie from `createCookie` or the CookieOptions to create one
     cookie: {
-      name: "_lauset_session",
-
-      // all of these are optional
-      // domain: "remix.run",
-      // expires: new Date(Date.now() + 60),
-      // httpOnly: true,
-      // maxAge: 60,
-      // path: "/",
-      // sameSite: "lax",
-      // secrets: ["s3cret1"],
-      // secure: true
+      name: "lauset_session",
+      domain: process.env.COOKIE_DOMAIN,
+      httpOnly: true,
+      maxAge: 5 * 60,
+      sameSite: "strict",
+      secrets: [process.env.COOKIE_SECRET ?? "s3cret1"],
+      secure: true,
     },
   });
 

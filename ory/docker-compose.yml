@@ -1,4 +1,4 @@
-version: '3.7'
+version: "3.7"
 
 services:
   kratos-migrate:
@@ -23,12 +23,12 @@ services:
       - kratos-migrate
     image: oryd/kratos:v0.8.2
     ports:
-      - '4433:4433' # public
-      - '4434:4434' # admin
+      - "4433:4433" # public
+      - "4434:4434" # admin
     restart: unless-stopped
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
-      - LOG_LEVEL=debug
+      # - LOG_LEVEL=debug
     command: serve -c /etc/config/kratos/kratos.yml --dev --watch-courier
     volumes:
       - type: volume
@@ -40,7 +40,7 @@ services:
         target: /etc/config/kratos
     networks:
       - intranet
-  
+
   hydra-migrate:
     image: oryd/hydra:v1.10.7-sqlite
     environment:
@@ -64,11 +64,11 @@ services:
     image: oryd/hydra:v1.10.7-sqlite
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true&mode=rwc
-      - LOG_LEVEL=debug
-      - HYDRA_URL=http://hydra:4445/
+      - HYDRA_URL=http://localhost:4445/
+      # - LOG_LEVEL=debug
     ports:
-      - '4444:4444' # public
-      - '4445:4445' # admin
+      - "4444:4444" # public
+      - "4445:4445" # admin
     volumes:
       - type: volume
         source: hydra-sqlite
@@ -85,15 +85,14 @@ services:
   mailslurper:
     image: oryd/mailslurper:latest-smtps
     ports:
-      - '4436:4436'
-      - '4437:4437'
+      - "4436:4436"
+      - "4437:4437"
     networks:
       - intranet
 
   #  alias hydra="docker-compose exec hydra hydra"
 
   #    hydra clients create \
-  #    --endpoint http://127.0.0.1:4445/ \
   #    --id secure-app \
   #    --secret secure-app \
   #    --grant-types client_credentials
@@ -101,7 +100,6 @@ services:
   #    --callbacks http://localhost:4180/oauth2/callback
 
   #    hydra clients create \
-  #    --endpoint http://127.0.0.1:4445 \
   #    --id auth-code-client \
   #    --secret secret \
   #    --grant-types authorization_code,refresh_token \
