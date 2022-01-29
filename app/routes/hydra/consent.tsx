@@ -172,7 +172,6 @@ const createHydraSession = (
     };
   }
 
-  console.debug("existing");
   return {
     // This data will be available when introspecting the token. Try to avoid sensitive information here,
     // unless you limit who can introspect tokens. (Therefore the scope-check above)
@@ -193,7 +192,7 @@ export default function Consent() {
     <Container>
       <Stack>
         <Heading>An application requests access to your data!</Heading>
-        <Form method="post">
+        <Form reloadDocument method="post">
           <input type="hidden" name="challenge" value={challenge} />
           {client.logo_uri && <Image src={client.logo_uri} />}
           <p>
@@ -208,6 +207,7 @@ export default function Consent() {
                 name="grant_scope"
                 id={scope}
                 value={scope}
+                defaultChecked
               />
               <label htmlFor={scope}>{scope}</label>
               <br />

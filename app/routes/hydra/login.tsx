@@ -24,12 +24,14 @@ export const loader: LoaderFunction = async ({ request }) => {
     // Now it's time to grant the login kratosRequest. You could also deny the kratosRequest if something went terribly wrong
     // (e.g. your arch-enemy logging in...)
     console.debug("Accepting ORY Hydra Login Request because skip is true");
-    const { data: body } = await hydraAdmin.acceptLoginRequest(hydraChallenge, {
+    const {
+      data: { redirect_to },
+    } = await hydraAdmin.acceptLoginRequest(hydraChallenge, {
       subject: data.subject,
     });
 
     // All we need to do now is to redirect the user back to hydra!
-    return redirect(body.redirect_to);
+    return redirect(redirect_to);
   }
 
   const hydraLoginState = params.get("hydra_login_state");
@@ -56,7 +58,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     );
 
     // User is authenticated, accept the LoginRequest and tell Hydra
-    const loginResponse = await hydraAdmin.acceptLoginRequest(hydraChallenge, {
+    const {
+      data: { redirect_to },
+    } = await hydraAdmin.acceptLoginRequest(hydraChallenge, {
       // We need to get the email of the user. We don't want to do that via traits as
       // they are dynamic. They would be part of the PublicAPI. That's not true
       // for identity.addresses So let's get it via the AdmninAPI
@@ -65,16 +69,15 @@ export const loader: LoaderFunction = async ({ request }) => {
     });
 
     // All we need to do now is to redirect the user back to hydra!
-    return redirect(loginResponse.data.redirect_to);
+    return redirect(redirect_to);
   } catch (e: any) {
     if (e.response && e.response.status === 403) {
-      return redirect(
-        getUrlForKratosFlow(
-          kratosBrowserUrl,
-          "login",
-          new URLSearchParams({ aal: "aal2" })
-        )
+      const redirect_to = getUrlForKratosFlow(
+        kratosBrowserUrl,
+        "login",
+        new URLSearchParams({ aal: "aal2" })
       );
+      return redirect(redirect_to);
     } else {
       return redirectToLogin(request);
     }
@@ -102,6 +105,7 @@ async function redirectToLogin(request: Request) {
   session.set("hydraLoginState", state);
 
   const return_to = new URL(request.url);
+  return_to.protocol = request.headers.get("X-Forwarded-Proto") ?? "http";
   return_to.searchParams.set("hydra_login_state", state);
 
   const redirect_to = getUrlForKratosFlow(
@@ -112,11 +116,6 @@ async function redirectToLogin(request: Request) {
       refresh: "true",
     })
   );
-
-  console.debug("redirecting to login", {
-    redirect_to,
-    return_to: return_to.toString(),
-  });
 
   return redirect(redirect_to, {
     headers: {

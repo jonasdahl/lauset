@@ -14,14 +14,12 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   let userInfo: Session | null = null;
   if (cookie?.includes("session")) {
-    const { data } = await kratosSdk.toSession(undefined, cookie).catch((e) => {
-      console.debug("failed to get session", e);
-      return { data: null };
-    });
-
+    const { data } = await kratosSdk
+      .toSession(undefined, cookie)
+      .catch((e) => ({ data: null }));
     userInfo = data;
   }
-  // const session = await getSession(cookie)
+
   return { logout_url, userInfo };
 };
 
@@ -50,7 +48,7 @@ export default function Welcome() {
           <UIScreenButton to="/registration" disabled={!!userInfo}>
             Sign up
           </UIScreenButton>
-          <UIScreenButton to="/recovery" disabled={!userInfo}>
+          <UIScreenButton to="/recovery" disabled={!!userInfo}>
             Recover account
           </UIScreenButton>
           <UIScreenButton to="/verification">Verify account</UIScreenButton>
