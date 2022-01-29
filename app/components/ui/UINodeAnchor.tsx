@@ -11,13 +11,13 @@ export function UINodeAnchor(
     <Button
       as={(props) => (
         <>
-          <Link
-            reloadDocument={props.to.startsWith("http")}
-            to={attributes.href}
-            {...props}
-          >
-            {attributes.title.text}
-          </Link>
+          {props.to.startsWith("http") ? (
+            <a href={props.to} {...props} />
+          ) : (
+            <Link to={attributes.href} {...props}>
+              {attributes.title.text}
+            </Link>
+          )}
           <Messages messages={messages} />
         </>
       )}
