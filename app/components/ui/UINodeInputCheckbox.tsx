@@ -1,29 +1,29 @@
-import { Input } from "@chakra-ui/react";
+import { Checkbox, FormControl, FormHelperText } from "@chakra-ui/react";
 import { getNodeLabel } from "@ory/integrations/ui";
 import { UiNode, UiNodeInputAttributes } from "@ory/kratos-client";
-import { Messages } from "../messages";
+import { Messages } from "../Messages";
 
 export function UINodeInputCheckbox(
   props: { attributes: UiNodeInputAttributes } & UiNode
 ) {
   const { attributes, messages } = props;
   return (
-    <fieldset>
-      <Input name={attributes.name} type="hidden" value="false" />
-      <Input
+    <FormControl
+      isDisabled={attributes.disabled}
+      isRequired={attributes.required}
+    >
+      <Checkbox
         name={attributes.name}
         id={attributes.name}
-        type={attributes.type}
         value="true"
-        placeholder={getNodeLabel(props)}
-        checked={(attributes as any).checked}
-        disabled={attributes.disabled}
-      />
-      <label htmlFor={attributes.name}>
-        <svg />
-        <span>{getNodeLabel(props)}</span>
-      </label>
-      <Messages messages={messages} />
-    </fieldset>
+        defaultChecked
+      >
+        {getNodeLabel(props)}
+      </Checkbox>
+
+      <FormHelperText>
+        <Messages messages={messages} />
+      </FormHelperText>
+    </FormControl>
   );
 }

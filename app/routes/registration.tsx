@@ -1,3 +1,4 @@
+import { Center } from "@chakra-ui/react";
 import { SelfServiceRegistrationFlow } from "@ory/client";
 import { Link, LoaderFunction, useLoaderData } from "remix";
 import { BasicUI } from "~/components/BasicUI";
@@ -17,7 +18,13 @@ export default function SignUp() {
     <BasicUI
       heading="Create an account"
       ui={flow.ui}
-      footer={<Link to="/login">Sign in</Link>}
+      footer={
+        <Center>
+          <Link reloadDocument to="/login">
+            Sign in
+          </Link>
+        </Center>
+      }
     />
   );
 }

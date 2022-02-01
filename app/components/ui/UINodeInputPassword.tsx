@@ -1,27 +1,55 @@
-import { Input } from "@chakra-ui/react";
+import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import {
+  Button,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Input,
+  InputGroup,
+  InputRightElement,
+} from "@chakra-ui/react";
 import { getNodeLabel } from "@ory/integrations/ui";
 import { UiNode, UiNodeInputAttributes } from "@ory/kratos-client";
+import { useState } from "react";
+import { Messages } from "../Messages";
 
 export function UINodeInputPassword(
   props: { attributes: UiNodeInputAttributes } & UiNode
 ) {
   const { attributes, messages } = props;
+  const [currentlyVisible, setVisible] = useState(false);
+
+  if (attributes.onclick) {
+    console.log("what is attributes.onclick?", attributes.onclick);
+  }
+
   return (
-    <fieldset>
-      <label>
+    <FormControl
+      isRequired={attributes.required}
+      isDisabled={attributes.disabled}
+    >
+      <FormLabel>{getNodeLabel(props)}</FormLabel>
+
+      <InputGroup>
         <Input
-          onclick={attributes.onclick}
           name={attributes.name}
           id={attributes.name}
-          type={attributes.type}
+          // type={attributes.type}
           value={attributes.value}
+          type={currentlyVisible ? "text" : "password"}
           placeholder={getNodeLabel(props)}
-          disabled={attributes.disabled}
         />
-        <span className="typography-h3">{getNodeLabel(props)}</span>
-        {/*<UINodeInputPasswordToggle />*/}
-      </label>
-      {messages.map((t) => t.text)}
-    </fieldset>
+        <InputRightElement width="4.5rem">
+          <Button onClick={() => setVisible(!currentlyVisible)}>
+            {currentlyVisible ? <ViewOffIcon /> : <ViewIcon />}
+          </Button>
+        </InputRightElement>
+      </InputGroup>
+      <Input />
+
+      <FormHelperText>
+        <Messages messages={messages} />
+      </FormHelperText>
+    </FormControl>
   );
 }

@@ -1,6 +1,6 @@
 import { Container, Heading, Stack } from "@chakra-ui/react";
 import { UiContainer } from "@ory/kratos-client";
-import { Messages } from "./messages";
+import { Messages } from "./Messages";
 import { UIForm } from "./ui/UIForm";
 
 export function BasicUI({

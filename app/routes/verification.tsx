@@ -1,3 +1,4 @@
+import { Center } from "@chakra-ui/react";
 import { SelfServiceVerificationFlow } from "@ory/kratos-client";
 import { Link, LoaderFunction, useLoaderData } from "remix";
 import { BasicUI } from "~/components/BasicUI";
@@ -16,7 +17,11 @@ export default function Verification() {
     <BasicUI
       ui={data.ui}
       heading="Verification"
-      footer={<Link to="/">Go back</Link>}
+      footer={
+        <Center>
+          <Link to="/">Go back</Link>
+        </Center>
+      }
     />
   );
 }

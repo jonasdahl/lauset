@@ -1,4 +1,4 @@
-import { Container, Heading, Stack } from "@chakra-ui/react";
+import { Box, Code, Container, Heading, Stack, Text } from "@chakra-ui/react";
 import { Session } from "@ory/kratos-client";
 import { LoaderFunction, useLoaderData } from "remix";
 // import { getSession } from "~/sessions";
@@ -16,7 +16,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (cookie?.includes("session")) {
     const { data } = await kratosSdk
       .toSession(undefined, cookie)
-      .catch((e) => ({ data: null }));
+      .catch(() => ({ data: null }));
     userInfo = data;
   }
 
@@ -32,30 +32,38 @@ export default function Welcome() {
       <Stack>
         <Heading as="h1">Welcome!</Heading>
 
-        <div className="box">
-          <h2 className="typography-h3">Session Information</h2>
-          <p className="typography-paragraph">
+        <Box py={3}>
+          <Heading as="h2">Session Information</Heading>
+          <Text>
             Below you will find the decoded Ory Session if you are logged in.
-          </p>
-          <pre className="code-box">
-            <code>{JSON.stringify(userInfo, null, 2)}</code>
-          </pre>
-        </div>
+          </Text>
+
+          <Code>
+            <pre>{JSON.stringify(userInfo, null, 2)}</pre>
+          </Code>
+        </Box>
+
         <Stack>
-          <UIScreenButton to="/login" disabled={!!userInfo}>
+          <UIScreenButton reloadDocument to="/login" disabled={!!userInfo}>
             Sign in
           </UIScreenButton>
-          <UIScreenButton to="/registration" disabled={!!userInfo}>
+          <UIScreenButton
+            reloadDocument
+            to="/registration"
+            disabled={!!userInfo}
+          >
             Sign up
           </UIScreenButton>
-          <UIScreenButton to="/recovery" disabled={!!userInfo}>
+          <UIScreenButton reloadDocument to="/recovery" disabled={!!userInfo}>
             Recover account
           </UIScreenButton>
-          <UIScreenButton to="/verification">Verify account</UIScreenButton>
-          <UIScreenButton to="/settings" disabled={!userInfo}>
+          <UIScreenButton reloadDocument to="/verification">
+            Verify account
+          </UIScreenButton>
+          <UIScreenButton reloadDocument to="/settings" disabled={!userInfo}>
             Account settings
           </UIScreenButton>
-          <UIScreenButton to={logout_url} disabled={!userInfo}>
+          <UIScreenButton reloadDocument to={logout_url} disabled={!userInfo}>
             Logout
           </UIScreenButton>
         </Stack>

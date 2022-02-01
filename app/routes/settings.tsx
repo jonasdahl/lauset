@@ -1,7 +1,7 @@
-import { Container, Heading, Stack } from "@chakra-ui/react";
+import { Container, Heading, Stack, Text } from "@chakra-ui/react";
 import { SelfServiceSettingsFlow } from "@ory/kratos-client";
 import { Link, LoaderFunction, useLoaderData } from "remix";
-import { Messages } from "~/components/messages";
+import { Messages } from "~/components/Messages";
 import { UIForm } from "~/components/ui/UIForm";
 import { getFlowOrRedirectToInit } from "~/utils/flow";
 import { kratosSdk } from "~/utils/ory.server";
@@ -60,10 +60,10 @@ export default function Verification() {
               <Heading as="h3" fontSize="xl">
                 Manage 2FA Backup Recovery Codes
               </Heading>
-              <p>
+              <Text>
                 Recovery codes can be used in panic situations where you have
                 lost access to your 2FA device.
-              </p>
+              </Text>
             </>
           }
         />
@@ -76,28 +76,28 @@ export default function Verification() {
               <Heading as="h3" fontSize="xl">
                 Manage 2FA TOTP Authenticator App
               </Heading>
-              <p>
+              <Text>
                 Add a TOTP Authenticator App to your account to improve your
                 account security. Popular Authenticator Apps are{" "}
-                <a href="https://www.lastpass.com" target="_blank">
+                <Link to="https://www.lastpass.com" target="_blank">
                   LastPass
-                </a>{" "}
+                </Link>{" "}
                 and Google Authenticator (
-                <a
-                  href="https://apps.apple.com/us/app/google-authenticator/id388497605"
+                <Link
+                  to="https://apps.apple.com/us/app/google-authenticator/id388497605"
                   target="_blank"
                 >
                   iOS
-                </a>
+                </Link>
                 ,
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
+                <Link
+                  to="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
                   target="_blank"
                 >
                   Android
-                </a>
+                </Link>
                 ).
-              </p>
+              </Text>
             </>
           }
         />
@@ -110,10 +110,10 @@ export default function Verification() {
               <Heading as="h3" fontSize="xl">
                 Manage Hardware Tokens and Biometrics
               </Heading>
-              <p>
+              <Text>
                 Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID,
                 TouchID) to enhance your account security.
-              </p>
+              </Text>
             </>
           }
         />

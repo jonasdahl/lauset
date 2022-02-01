@@ -1,9 +1,21 @@
-import { Container, Heading, Image, Stack } from "@chakra-ui/react";
+import {
+  Button,
+  Checkbox,
+  Container,
+  FormControl,
+  Heading,
+  Image,
+  ListItem,
+  Stack,
+  Text,
+  UnorderedList,
+} from "@chakra-ui/react";
 import { OAuth2Client } from "@ory/hydra-client";
 import { Session } from "@ory/kratos-client";
 import {
   ActionFunction,
   Form,
+  Link,
   LoaderFunction,
   redirect,
   useLoaderData,
@@ -195,61 +207,55 @@ export default function Consent() {
         <Form reloadDocument method="post">
           <input type="hidden" name="challenge" value={challenge} />
           {client.logo_uri && <Image src={client.logo_uri} />}
-          <p>
+          <Text>
             Hi {user}, application{" "}
-            <strong>{client.client_name ?? client.client_id}</strong> wants
-            access resources on your behalf and to:
-          </p>
-          {requested_scope.map((scope) => (
-            <div key={scope}>
-              <input
-                type="checkbox"
+            <Text as="strong">{client.client_name ?? client.client_id}</Text>{" "}
+            wants access resources on your behalf and to:
+          </Text>
+          <FormControl>
+            {requested_scope.map((scope) => (
+              <Checkbox
                 name="grant_scope"
                 id={scope}
                 value={scope}
                 defaultChecked
-              />
-              <label htmlFor={scope}>{scope}</label>
-              <br />
-            </div>
-          ))}
+              >
+                {scope}
+              </Checkbox>
+            ))}
+          </FormControl>
 
-          <p>
+          <Text>
             Do you want to be asked next time when this application wants to
             access your data? The application will not be able to ask for more
             permissions without your consent.
-          </p>
+          </Text>
 
-          <ul>
+          <UnorderedList>
             {client.policy_uri && (
-              <li>
-                <a href={client.policy_uri}>Policy</a>
-              </li>
+              <ListItem>
+                <Link reloadDocument to={client.policy_uri}>
+                  Policy
+                </Link>
+              </ListItem>
             )}
             {client.tos_uri && (
-              <li>
-                <a href={client.tos_uri}>Terms of Service</a>
-              </li>
+              <ListItem>
+                <Link reloadDocument to={client.tos_uri}>
+                  Terms of Service
+                </Link>
+              </ListItem>
             )}
-          </ul>
+          </UnorderedList>
 
-          <p>
-            <input type="checkbox" name="remember" id="remember" value="1" />
-            <label htmlFor="remember">Do not ask me again</label>
+          <Stack>
+            <Checkbox name="remember" id="remember" value="1">
+              Do not ask me again
+            </Checkbox>
 
-            <input
-              type="submit"
-              name="submit"
-              id="accept"
-              value="Allow access"
-            />
-            <input
-              type="submit"
-              name="submit"
-              id="reject"
-              value="Deny access"
-            />
-          </p>
+            <Button type="submit" id="accept" value="Allow access" />
+            <Button type="submit" id="reject" value="Deny access" />
+          </Stack>
         </Form>
       </Stack>
     </Container>

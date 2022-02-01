@@ -1,60 +1,50 @@
+import { Code, Stack, Text, Wrap, WrapItem } from "@chakra-ui/react";
 import { getNodeLabel } from "@ory/integrations/ui";
 import { UiNode, UiNodeTextAttributes } from "@ory/kratos-client";
 
 export function UINodeText(
   props: { attributes: UiNodeTextAttributes } & UiNode
 ) {
-  const { attributes } = props;
   return (
-    <div>
-      <p>{getNodeLabel(props)}</p>
-      {attributes.text.id === 1050015 ? (
-        <div className="container-fluid">
-          <div className="row">
-            {attributes.text.context?.secrets.map((secret) => (
-              <div className="recovery-code">
-                {secret.id === 1050014 ? (
-                  <code>Used</code>
-                ) : (
-                  <code>{secret.text}</code>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <pre>
-          <code>{attributes.text.text}</code>
-        </pre>
-      )}
-    </div>
+    <Stack>
+      <Text>{getNodeLabel(props)}</Text>
+      <Content {...props} />
+    </Stack>
   );
 }
 
-/*
-<div data-testid="node/text/{{attributes.id}}">
-  <p style="margin-bottom: .5rem"
-     data-testid="node/text/{{attributes.id}}/label"
-     class="typography-paragraph">
-    {{getNodeLabel .}}
-  </p>
-  {{#if (eq attributes.text.id 1050015)}}
-    <!-- lookup_secret -->
-    <div class="container-fluid"
-         data-testid="node/text/{{attributes.id}}/text">
-      <div class="row">
-        {{#each attributes.text.context.secrets}}
-          <!-- Used lookup_secret has ID 1050014 -->
-          <div data-testid="node/text/{{attributes.id}}/lookup_secret"
-               class="col-xs-3 recovery-code">
-            {{#if (eq id 1050014)}}<code>Used</code>{{else}}<code>{{text}}</code>{{/if}}</div>
-        {{/each}}
-      </div>
-      <!--Recovery Code-->
-    </div>
-  {{else}}
-    <pre style="margin-top: 0"><code
-      data-testid="node/text/{{attributes.id}}/text">{{attributes.text.text}}</code></pre>
-  {{/if}}
-</div>
-*/
+// TODO: where are these defined? in the kratos identity.schema.json?
+const LOOKUP_SECRET_TEXT_ID = 1050015;
+const LOOKUP_SECRET_USED_ID = 1050014;
+
+function Content({
+  attributes,
+}: { attributes: UiNodeTextAttributes } & UiNode) {
+  console.log("UINodeText attributes", { attributes });
+  switch (attributes.text.id) {
+    case LOOKUP_SECRET_TEXT_ID:
+      return <LookupSecret {...(attributes.text.context as any)} />;
+    default:
+      return <Code>{attributes.text.text}</Code>;
+  }
+}
+
+function LookupSecret({
+  secrets,
+}: {
+  secrets: Array<{ id: number; text: string }>;
+}) {
+  return (
+    <Wrap>
+      {secrets.map((secret) => (
+        <WrapItem>
+          {secret.id === LOOKUP_SECRET_USED_ID ? (
+            <Code>Used</Code>
+          ) : (
+            <Code>{secret.text}</Code>
+          )}
+        </WrapItem>
+      ))}
+    </Wrap>
+  );
+}

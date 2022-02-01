@@ -1,7 +1,7 @@
-import { Button } from "@chakra-ui/react";
+import { Button, Stack } from "@chakra-ui/react";
 import { getNodeLabel } from "@ory/integrations/ui";
 import { UiNode, UiNodeInputAttributes } from "@ory/kratos-client";
-import { Messages } from "../messages";
+import { Messages } from "../Messages";
 
 export function UINodeInputButton(
   props: { attributes: UiNodeInputAttributes } & UiNode
@@ -14,7 +14,7 @@ export function UINodeInputButton(
     );
   }
   return (
-    <>
+    <Stack>
       <Button
         name={attributes.name}
         type={attributes.type as "button" | "submit" | "reset"}
@@ -24,6 +24,6 @@ export function UINodeInputButton(
         {getNodeLabel(props)}
       </Button>
       <Messages messages={messages} />
-    </>
+    </Stack>
   );
 }

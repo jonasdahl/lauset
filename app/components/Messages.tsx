@@ -1,4 +1,4 @@
-import { ListItem, UnorderedList } from "@chakra-ui/react";
+import { Code, ListItem, UnorderedList } from "@chakra-ui/react";
 import { UiText } from "@ory/kratos-client";
 
 export function Messages({ messages }: { messages?: UiText[] }) {
@@ -8,17 +8,15 @@ export function Messages({ messages }: { messages?: UiText[] }) {
     <UnorderedList>
       {messages?.map((m) => (
         <ListItem key={m.id} className="message">
-          {m.text}
+          <details>
+            <summary>{m.text}</summary>
+            <Code>
+              {/* TODO: remove this */}
+              <pre>{JSON.stringify(m.text, null, 2)}</pre>
+            </Code>
+          </details>
         </ListItem>
       ))}
     </UnorderedList>
   );
 }
-
-/*
-<div class="messages {{className}}">
-  {{~#each messages~}}
-  <div class="message" data-testid="ui/message/{{id}}">{{ text }}</div>
-  {{~/each~}}
-</div>
-*/

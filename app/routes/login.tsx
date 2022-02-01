@@ -1,5 +1,6 @@
-import { Container, Heading, Stack } from "@chakra-ui/react";
+import { Center, Container, Heading, Stack } from "@chakra-ui/react";
 import { SelfServiceLoginFlow } from "@ory/kratos-client";
+import { Link } from "react-router-dom";
 import { LoaderFunction, useLoaderData } from "remix";
 import { UIForm } from "~/components/ui/UIForm";
 import { UIScreenButton } from "~/components/ui/UIScreenButton";
@@ -64,16 +65,18 @@ export default function Login() {
         <UIForm ui={data.ui} />
 
         {data.isAuthenticated ? (
-          <>
-            <a href={data.logout_url}>Log out</a>
-          </>
+          <Center>
+            <Link reloadDocument to={data.logout_url}>
+              Log out
+            </Link>
+          </Center>
         ) : (
-          <>
+          <Stack>
             <UIScreenButton to={data.register_url}>
               Create account
             </UIScreenButton>
             <UIScreenButton to="/recovery">Recover account</UIScreenButton>
-          </>
+          </Stack>
         )}
       </Stack>
     </Container>

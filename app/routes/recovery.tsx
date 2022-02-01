@@ -1,3 +1,4 @@
+import { Center } from "@chakra-ui/react";
 import { SelfServiceRecoveryFlow } from "@ory/kratos-client";
 import { Link, LoaderFunction, useLoaderData } from "remix";
 import { BasicUI } from "~/components/BasicUI";
@@ -16,7 +17,13 @@ export default function Recovery() {
     <BasicUI
       ui={data.ui}
       heading="Recovery"
-      footer={<Link to="/login">Go Back</Link>}
+      footer={
+        <Center>
+          <Link reloadDocument to="/login">
+            Go Back
+          </Link>
+        </Center>
+      }
     />
   );
 }
