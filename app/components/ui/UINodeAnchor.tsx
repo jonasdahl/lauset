@@ -11,9 +11,9 @@ export function UINodeAnchor(
     <Button
       as={(props) => (
         <>
-          <Link reloadDocument to={attributes.href} {...props}>
+          <a to={attributes.href} {...props}>
             {attributes.title.text}
-          </Link>
+          </a>
           <Messages messages={messages} />
         </>
       )}

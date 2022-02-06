@@ -15,11 +15,11 @@ import { Session } from "@ory/kratos-client";
 import {
   ActionFunction,
   Form,
-  Link,
   LoaderFunction,
   redirect,
   useLoaderData,
 } from "remix";
+import { Link } from "~/components/Link";
 import { hydraAdmin } from "~/utils/ory.server";
 
 type ViewData = {
@@ -234,16 +234,12 @@ export default function Consent() {
           <UnorderedList>
             {client.policy_uri && (
               <ListItem>
-                <Link reloadDocument to={client.policy_uri}>
-                  Policy
-                </Link>
+                <Link href={client.policy_uri}>Policy</Link>
               </ListItem>
             )}
             {client.tos_uri && (
               <ListItem>
-                <Link reloadDocument to={client.tos_uri}>
-                  Terms of Service
-                </Link>
+                <Link href={client.tos_uri}>Terms of Service</Link>
               </ListItem>
             )}
           </UnorderedList>

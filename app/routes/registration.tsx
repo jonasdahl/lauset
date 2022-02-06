@@ -1,7 +1,8 @@
 import { Center } from "@chakra-ui/react";
 import { SelfServiceRegistrationFlow } from "@ory/client";
-import { Link, LoaderFunction, useLoaderData } from "remix";
+import { LoaderFunction, useLoaderData } from "remix";
 import { BasicUI } from "~/components/BasicUI";
+import { Link } from "~/components/Link";
 import { getFlowOrRedirectToInit } from "~/utils/flow";
 import { kratosSdk } from "~/utils/ory.server";
 
@@ -20,9 +21,7 @@ export default function SignUp() {
       ui={flow.ui}
       footer={
         <Center>
-          <Link reloadDocument to="/login">
-            Sign in
-          </Link>
+          <Link href="/login">Sign in</Link>
         </Center>
       }
     />

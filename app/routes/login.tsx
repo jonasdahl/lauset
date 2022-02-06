@@ -1,6 +1,6 @@
 import { Center, Container, Heading, Stack } from "@chakra-ui/react";
 import { SelfServiceLoginFlow } from "@ory/kratos-client";
-import { Link } from "react-router-dom";
+import { Link } from "~/components/Link";
 import { LoaderFunction, useLoaderData } from "remix";
 import { UIForm } from "~/components/ui/UIForm";
 import { UIScreenButton } from "~/components/ui/UIScreenButton";
@@ -66,9 +66,7 @@ export default function Login() {
 
         {data.isAuthenticated ? (
           <Center>
-            <Link reloadDocument to={data.logout_url}>
-              Log out
-            </Link>
+            <Link href={data.logout_url}>Log out</Link>
           </Center>
         ) : (
           <Stack>

@@ -26,7 +26,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function Welcome() {
   const { logout_url, userInfo } =
     useLoaderData<{ logout_url: string; userInfo: Session }>();
-  // TODO: ui
+
   return (
     <Container py={6}>
       <Stack>
@@ -44,26 +44,20 @@ export default function Welcome() {
         </Box>
 
         <Stack>
-          <UIScreenButton reloadDocument to="/login" disabled={!!userInfo}>
+          <UIScreenButton href="/login" disabled={!!userInfo}>
             Sign in
           </UIScreenButton>
-          <UIScreenButton
-            reloadDocument
-            to="/registration"
-            disabled={!!userInfo}
-          >
+          <UIScreenButton href="/registration" disabled={!!userInfo}>
             Sign up
           </UIScreenButton>
-          <UIScreenButton reloadDocument to="/recovery" disabled={!!userInfo}>
+          <UIScreenButton href="/recovery" disabled={!!userInfo}>
             Recover account
           </UIScreenButton>
-          <UIScreenButton reloadDocument to="/verification">
-            Verify account
-          </UIScreenButton>
-          <UIScreenButton reloadDocument to="/settings" disabled={!userInfo}>
+          <UIScreenButton href="/verification">Verify account</UIScreenButton>
+          <UIScreenButton href="/settings" disabled={!userInfo}>
             Account settings
           </UIScreenButton>
-          <UIScreenButton reloadDocument to={logout_url} disabled={!userInfo}>
+          <UIScreenButton href={logout_url} disabled={!userInfo}>
             Logout
           </UIScreenButton>
         </Stack>
