@@ -40,7 +40,7 @@ export function UIForm({
       <Stack>
         {before}
         {filterNodesByGroups(ui.nodes, only).map((node) => (
-          <UINode node={node} />
+          <UINode key={getKey(node)} node={node} />
         ))}
         {after}
       </Stack>
@@ -48,25 +48,33 @@ export function UIForm({
   );
 }
 
+function getKey({ attributes }: UiNode) {
+  if (isUiNodeAnchorAttributes(attributes)) {
+    return attributes.id;
+  } else if (isUiNodeImageAttributes(attributes)) {
+    return attributes.id;
+  } else if (isUiNodeInputAttributes(attributes)) {
+    return attributes.name;
+  } else if (isUiNodeScriptAttributes(attributes)) {
+    return attributes.id;
+  } else if (isUiNodeTextAttributes(attributes)) {
+    return attributes.id;
+  }
+}
+
 function UINode({ node: { attributes, ...rest } }: { node: UiNode }) {
   if (isUiNodeAnchorAttributes(attributes)) {
-    return (
-      <UINodeAnchor key={attributes.id} attributes={attributes} {...rest} />
-    );
+    return <UINodeAnchor attributes={attributes} {...rest} />;
   } else if (isUiNodeImageAttributes(attributes)) {
-    return (
-      <UINodeImage key={attributes.id} attributes={attributes} {...rest} />
-    );
+    return <UINodeImage attributes={attributes} {...rest} />;
   } else if (isUiNodeInputAttributes(attributes)) {
     return (
       <UINodeInput key={attributes.name} attributes={attributes} {...rest} />
     );
   } else if (isUiNodeScriptAttributes(attributes)) {
-    return (
-      <UINodeScript key={attributes.id} attributes={attributes} {...rest} />
-    );
+    return <UINodeScript attributes={attributes} {...rest} />;
   } else if (isUiNodeTextAttributes(attributes)) {
-    return <UINodeText key={attributes.id} attributes={attributes} {...rest} />;
+    return <UINodeText attributes={attributes} {...rest} />;
   }
 
   return <UINodeInputDefault attributes={attributes} {...rest} />;
