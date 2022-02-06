@@ -1,5 +1,14 @@
-import { Code, Stack, Text, Wrap, WrapItem } from "@chakra-ui/react";
+import {
+  Code,
+  Stack,
+  Tag,
+  Text,
+  Tooltip,
+  Wrap,
+  WrapItem,
+} from "@chakra-ui/react";
 import { getNodeLabel } from "@ory/integrations/ui";
+import { range } from "lodash";
 import { UiNode, UiNodeTextAttributes } from "@ory/kratos-client";
 
 export function UINodeText(
@@ -39,9 +48,17 @@ function LookupSecret({
       {secrets.map((secret) => (
         <WrapItem>
           {secret.id === LOOKUP_SECRET_USED_ID ? (
-            <Code>Used</Code>
+            <Tooltip label={secret.text}>
+              <Tag colorScheme="red" fontFamily="mono">
+                {range(0, 8).map(() => (
+                  <>&nbsp;</>
+                ))}
+              </Tag>
+            </Tooltip>
           ) : (
-            <Code>{secret.text}</Code>
+            <Tag colorScheme="green" fontFamily="mono">
+              {secret.text}
+            </Tag>
           )}
         </WrapItem>
       ))}

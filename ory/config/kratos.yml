@@ -17,6 +17,12 @@ selfservice:
   methods:
     password:
       enabled: true
+    totp:
+      enabled: true
+      config:
+        issuer: Lauset
+    lookup_secret:
+      enabled: true
 
   flows:
     error:
@@ -50,8 +56,7 @@ selfservice:
       after:
         password:
           hooks:
-            -
-              hook: session
+            - hook: session
 
 log:
   level: debug

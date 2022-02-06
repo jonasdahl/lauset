@@ -12,7 +12,7 @@ export function Messages({ messages }: { messages?: UiText[] }) {
             <summary>{m.text}</summary>
             <Code>
               {/* TODO: remove this */}
-              <pre>{JSON.stringify(m.text, null, 2)}</pre>
+              <pre>{JSON.stringify(m, null, 2)}</pre>
             </Code>
           </details>
         </ListItem>
@@ -20,3 +20,13 @@ export function Messages({ messages }: { messages?: UiText[] }) {
     </UnorderedList>
   );
 }
+
+/*
+{
+  "id": 1010004,
+  "text": "Please complete the second authentication challenge.",
+  "type": "info",
+  "context": {}
+}
+
+*/

@@ -10,6 +10,7 @@ import {
   kratosBrowserUrl,
   kratosSdk,
 } from "~/utils/ory.server";
+import { Messages } from "~/components/Messages";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const login = await getFlowOrRedirectToInit(
@@ -61,6 +62,8 @@ export default function Login() {
             ? "Two-Factor Authentication"
             : "Sign In"}
         </Heading>
+
+        <Messages messages={data.ui.messages} />
 
         <UIForm ui={data.ui} />
 

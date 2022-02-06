@@ -16,6 +16,7 @@ import { UINodeInputDefault } from "./UINodeInputDefault";
 import { UINodeInputHidden } from "./UINodeInputHidden";
 import { UINodeScript } from "./UINodeScript";
 import { UINodeText } from "./UINodeText";
+import { groupBy } from "lodash";
 
 export function UIForm({
   ui,
@@ -35,16 +36,29 @@ export function UIForm({
     return null;
   }
 
+  console.log(ui.nodes);
+
   return (
-    <form action={ui.action} method={ui.method}>
-      <Stack>
-        {before}
-        {filterNodesByGroups(ui.nodes, only).map((node) => (
-          <UINode key={getKey(node)} node={node} />
-        ))}
-        {after}
-      </Stack>
-    </form>
+    <Stack>
+      {before}
+      {Object.values(
+        groupBy(filterNodesByGroups(ui.nodes, only, true), (n) => n.group)
+      ).map((nodes) => (
+        <form action={ui.action} method={ui.method}>
+          <Stack>
+            {ui.nodes
+              .filter((n) => n.group === "default")
+              .map((node) => (
+                <UINode key={getKey(node)} node={node} />
+              ))}
+            {nodes.map((node) => (
+              <UINode key={getKey(node)} node={node} />
+            ))}
+          </Stack>
+        </form>
+      ))}
+      {after}
+    </Stack>
   );
 }
 
