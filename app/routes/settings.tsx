@@ -1,4 +1,4 @@
-import { Container, Heading, Stack, Text } from "@chakra-ui/react";
+import { Center, Container, Heading, Stack, Text } from "@chakra-ui/react";
 import { SelfServiceSettingsFlow } from "@ory/kratos-client";
 import { Link, LoaderFunction, useLoaderData } from "remix";
 import { Messages } from "~/components/Messages";
@@ -118,7 +118,9 @@ export default function Verification() {
           }
         />
 
-        <Link to="/">Go back</Link>
+        <Center>
+          <Link to="/">Go back</Link>
+        </Center>
       </Stack>
     </Container>
   );
