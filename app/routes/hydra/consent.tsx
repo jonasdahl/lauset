@@ -41,6 +41,8 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const { data: body } = await hydraAdmin.getConsentRequest(challenge);
 
+  const context = body.context as Session;
+
   // If a user has granted this application the requested scope, hydra will tell us to not show the UI.
   if (body.skip) {
     // You can apply logic here, for example grant another scope, or do whatever...
@@ -56,10 +58,7 @@ export const loader: LoaderFunction = async ({ request }) => {
       grant_access_token_audience: body.requested_access_token_audience,
 
       // The session allows us to set session data for id and access tokens. Let's add the email if it is included.
-      session: createHydraSession(
-        body.requested_scope,
-        body.context as Session
-      ),
+      session: createHydraSession(body.requested_scope, context),
     });
     return redirect(redirect_to);
   }
@@ -70,7 +69,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     // We have a bunch of data available from the response, check out the API docs to find what these values mean
     // and what additional data you have available.
     requested_scope: body.requested_scope,
-    user: body.subject,
+    user: context.identity.verifiable_addresses?.[0].value,
     client: body.client,
   } as ViewData;
 };
@@ -84,7 +83,7 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   // Let's see if the user decided to accept or reject the consent request..
-  if (form.get("submit") !== "Allow access") {
+  if (form.get("submit") !== "accept") {
     // Looks like the consent request was denied by the user
     const {
       data: { redirect_to },
@@ -213,23 +212,19 @@ export default function Consent() {
             wants access resources on your behalf and to:
           </Text>
           <FormControl>
-            {requested_scope.map((scope) => (
-              <Checkbox
-                name="grant_scope"
-                id={scope}
-                value={scope}
-                defaultChecked
-              >
-                {scope}
-              </Checkbox>
-            ))}
+            <Stack>
+              {requested_scope.map((scope) => (
+                <Checkbox
+                  name="grant_scope"
+                  id={scope}
+                  value={scope}
+                  defaultChecked
+                >
+                  {scope}
+                </Checkbox>
+              ))}
+            </Stack>
           </FormControl>
-
-          <Text>
-            Do you want to be asked next time when this application wants to
-            access your data? The application will not be able to ask for more
-            permissions without your consent.
-          </Text>
 
           <UnorderedList>
             {client.policy_uri && (
@@ -244,13 +239,23 @@ export default function Consent() {
             )}
           </UnorderedList>
 
+          <Text>
+            Do you want to be asked next time when this application wants to
+            access your data? The application will not be able to ask for more
+            permissions without your consent.
+          </Text>
+
           <Stack>
             <Checkbox name="remember" id="remember" value="1">
               Do not ask me again
             </Checkbox>
 
-            <Button type="submit" id="accept" value="Allow access" />
-            <Button type="submit" id="reject" value="Deny access" />
+            <Button type="submit" name="submit" value="accept">
+              Allow access
+            </Button>
+            <Button type="submit" name="submit" value="reject">
+              Deny access
+            </Button>
           </Stack>
         </Form>
       </Stack>

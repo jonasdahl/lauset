@@ -29,4 +29,17 @@ export function Messages({ messages }: { messages?: UiText[] }) {
   "context": {}
 }
 
+{
+  "id": 4000006,
+  "text": "The provided credentials are invalid, check for spelling mistakes in your password or username, email address, or phone number.",
+  "type": "error",
+  "context": {}
+}
+
+{
+  "id": 1010003,
+  "text": "Please confirm this action by verifying that it is you.",
+  "type": "info",
+  "context": {}
+}
 */
