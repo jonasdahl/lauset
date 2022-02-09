@@ -42,29 +42,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Checkout homelab repository
-        uses: actions/checkout@v2
-        with:
-          repository: addreas/homelab
-          path: homelab
-          token: ${{ secrets.PUSH_SECRET }}
-
-      - name: Generate version file
-        run: |
-          cat <<EOF > ./homelab/resources/system/lauset/version.cue
-          package kube
-
-          lausetVersion: "$VERSION"
-          EOF
-      - name: Upgrade staging environment by pushing to homelab
-        env:
-          REPO_KEY: ${{ secrets.PUSH_SECRET }}
-          USERNAME: github-actions[bot]
-        run: |
-          cd homelab
-          git config --local user.name "github-actions[bot]"
-          git config --local user.email "jonas+bot@jdahl.se"
-          git add resources/system/lauset/version.cue
-          git commit -m "Upgrade lauset version to $VERSION"
-          git push https://$USERNAME:$REPO_KEY@github.com/addreas/homelab.git
