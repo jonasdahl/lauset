@@ -96,7 +96,7 @@ services:
   #    --id secure-app \
   #    --secret secure-app \
   #    --grant-types client_credentials
-  #    --scopes oidc,email,profile
+  #    --scope oidc,email,profile
   #    --callbacks http://localhost:4180/oauth2/callback
 
   #    hydra clients create \

@@ -1,23 +1,21 @@
-import { Code, ListItem, UnorderedList } from "@chakra-ui/react";
+import { Alert, AlertIcon, Stack } from "@chakra-ui/react";
 import { UiText } from "@ory/kratos-client";
 
 export function Messages({ messages }: { messages?: UiText[] }) {
   if (!messages || !messages.length) return null;
 
   return (
-    <UnorderedList>
+    <Stack>
       {messages?.map((m) => (
-        <ListItem key={m.id} className="message">
-          <details>
-            <summary>{m.text}</summary>
-            <Code>
-              {/* TODO: remove this */}
-              <pre>{JSON.stringify(m, null, 2)}</pre>
-            </Code>
-          </details>
-        </ListItem>
+        <Alert
+          key={m.id}
+          status={m.type as "success" | "info" | "warning" | "error"}
+        >
+          <AlertIcon />
+          {m.text}
+        </Alert>
       ))}
-    </UnorderedList>
+    </Stack>
   );
 }
 
@@ -41,5 +39,23 @@ export function Messages({ messages }: { messages?: UiText[] }) {
   "text": "Please confirm this action by verifying that it is you.",
   "type": "info",
   "context": {}
+}
+
+{
+  "id": 4000005,
+  "text": "The password can not be used because the password is too similar to the user identifier.",
+  "type": "error",
+  "context": {
+    "reason": "the password is too similar to the user identifier"
+  }
+}
+
+{
+  "id": 4000005,
+  "text": "The password can not be used because password length must be at least 8 characters but only got 4.",
+  "type": "error",
+  "context": {
+    "reason": "password length must be at least 8 characters but only got 4"
+  }
 }
 */
