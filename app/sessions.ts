@@ -6,7 +6,7 @@ const { getSession, commitSession, destroySession } =
       name: "lauset_session",
       domain: process.env.COOKIE_DOMAIN,
       httpOnly: true,
-      maxAge: 5 * 60,
+      maxAge: 24 * 60 * 60,
       sameSite: "strict",
       secrets: [process.env.COOKIE_SECRET ?? "s3cret1"],
       secure: true,
