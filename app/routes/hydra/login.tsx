@@ -72,7 +72,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect(redirect_to);
   } catch (e: any) {
     if (e.response && e.response.status === 403) {
-      return redirectToLogin(request, { aal: "aal2" });
+      return redirectToLogin(request, { aal: "aal2" }, true);
     } else {
       return redirectToLogin(request);
     }
@@ -81,18 +81,17 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 async function redirectToLogin(
   request: Request,
-  loginParams?: Record<string, string>
+  loginParams?: Record<string, string>,
+  preserveState?: boolean
 ) {
   const session = await getSession(request.headers.get("Cookie"));
   if (!session) {
     throw new Error("failed to get session");
   }
 
-  console.log(
-    "Initiating ORY Kratos Login flow because neither a ORY Kratos Login Request nor a valid ORY Kratos Session was found."
-  );
-  const state = crypto.randomBytes(48).toString("hex");
-
+  const state = !!preserveState
+    ? session.get("hydraLoginState")
+    : crypto.randomBytes(48).toString("hex");
   session.set("hydraLoginState", state);
 
   const return_to = new URL(request.url);
