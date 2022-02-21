@@ -10,9 +10,9 @@ import {
   Scripts,
   ScrollRestoration,
 } from "remix";
-import { env } from "./config.server";
 import ClientStyleContext from "./context.client";
 import ServerStyleContext from "./context.server";
+import { env } from "./config.client";
 
 export const meta: MetaFunction = () => {
   return { title: "Authentication" };

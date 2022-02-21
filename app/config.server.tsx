@@ -1,4 +1,4 @@
-import { cleanEnv, host, str, url, makeValidator } from "envalid";
+import { cleanEnv, host, str, url } from "envalid";
 
 export const env = cleanEnv(process.env, {
   KRATOS_PUBLIC_URL: url({ devDefault: "http://localhost:4433" }),
