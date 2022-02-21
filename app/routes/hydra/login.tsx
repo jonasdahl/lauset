@@ -72,31 +72,22 @@ export const loader: LoaderFunction = async ({ request }) => {
     return redirect(redirect_to);
   } catch (e: any) {
     if (e.response && e.response.status === 403) {
-      const redirect_to = getUrlForKratosFlow(
-        kratosBrowserUrl,
-        "login",
-        new URLSearchParams({ aal: "aal2" })
-      );
-      return redirect(redirect_to);
+      return redirectToLogin(request, { aal: "aal2" });
     } else {
       return redirectToLogin(request);
     }
   }
 };
 
-async function redirectToLogin(request: Request) {
+async function redirectToLogin(
+  request: Request,
+  loginParams?: Record<string, string>
+) {
   const session = await getSession(request.headers.get("Cookie"));
   if (!session) {
     throw new Error("failed to get session");
   }
 
-  // 3. Initiate login flow with ORY Kratos:
-  //
-  //   - `prompt=login` forces a new login from kratos regardless of browser sessions.
-  //      This is important because we are letting Hydra handle sessions
-  //   - `redirect_to` ensures that when we redirect back to this url,
-  //      we will have both the initial ORY Hydra Login Challenge and the ORY Kratos Login Request ID in
-  //      the URL query parameters.
   console.log(
     "Initiating ORY Kratos Login flow because neither a ORY Kratos Login Request nor a valid ORY Kratos Session was found."
   );
@@ -114,6 +105,7 @@ async function redirectToLogin(request: Request) {
     new URLSearchParams({
       return_to: return_to.toString(),
       refresh: "true",
+      ...loginParams,
     })
   );
 
