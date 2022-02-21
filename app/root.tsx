@@ -10,6 +10,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "remix";
+import { env } from "./config.server";
 import ClientStyleContext from "./context.client";
 import ServerStyleContext from "./context.server";
 
@@ -57,7 +58,7 @@ const App = withEmotionCache((_, emotionCache) => {
         </ChakraProvider>
         <ScrollRestoration />
         <Scripts />
-        {process.env.NODE_ENV === "development" && <LiveReload />}
+        {env.isDev && <LiveReload />}
       </body>
     </html>
   );

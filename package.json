@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "remix-app-template",
+  "name": "lauset",
   "description": "",
   "license": "",
   "scripts": {
@@ -11,32 +11,33 @@
     "start": "remix-serve build"
   },
   "dependencies": {
-    "@babel/core": "^7.16.7",
-    "@chakra-ui/icons": "^1.1.1",
-    "@chakra-ui/react": "^1.7.4",
+    "@babel/core": "^7.17.5",
+    "@chakra-ui/icons": "^1.1.7",
+    "@chakra-ui/react": "^1.8.5",
     "@emotion/cache": "^11.7.1",
-    "@emotion/react": "^11.7.1",
+    "@emotion/react": "^11.8.1",
     "@emotion/server": "^11.4.0",
-    "@emotion/styled": "^11.6.0",
-    "@ory/client": "^0.0.1-alpha.46",
-    "@ory/hydra-client": "^1.10.6",
-    "@ory/integrations": "^0.2.1",
+    "@emotion/styled": "^11.8.1",
+    "@ory/client": "^0.0.1-alpha.104",
+    "@ory/hydra-client": "^1.11.5",
+    "@ory/integrations": "^0.2.2",
     "@ory/kratos-client": "^0.8.2-alpha.1",
-    "@remix-run/dev": "^1.1.1",
-    "@remix-run/react": "^1.1.1",
-    "@remix-run/serve": "^1.1.1",
-    "@types/lodash": "^4.14.178",
-    "dotenv": "^12.0.3",
-    "framer-motion": "^5.6.0",
+    "@remix-run/dev": "^1.2.1",
+    "@remix-run/react": "^1.2.1",
+    "@remix-run/serve": "^1.2.1",
+    "dotenv": "^16.0.0",
+    "envalid": "^7.2.2",
+    "framer-motion": "^6.2.7",
     "lodash": "^4.17.21",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "remix": "^1.1.1"
+    "remix": "^1.2.1"
   },
   "devDependencies": {
-    "@types/react": "^17.0.24",
+    "@types/lodash": "^4.14.178",
+    "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.9",
-    "typescript": "^4.1.2"
+    "typescript": "^4.5.5"
   },
   "engines": {
     "node": ">=14"

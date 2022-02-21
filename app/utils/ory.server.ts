@@ -6,9 +6,10 @@ import {
   Configuration as KratosConfiguration,
   V0alpha2Api,
 } from "@ory/kratos-client";
+import { env } from "~/config.server";
 
-export const kratosPublicUrl = process.env.KRATOS_PUBLIC_URL!;
-export const kratosBrowserUrl = process.env.KRATOS_BROWSER_URL!;
+export const kratosPublicUrl = env.KRATOS_PUBLIC_URL;
+export const kratosBrowserUrl = env.KRATOS_BROWSER_URL;
 
 export const kratosSdk = new V0alpha2Api(
   new KratosConfiguration({
@@ -16,7 +17,7 @@ export const kratosSdk = new V0alpha2Api(
   })
 );
 
-export const hydraAdminUrl = process.env.HYDRA_ADMIN_URL!;
+export const hydraAdminUrl = env.HYDRA_ADMIN_URL;
 export const hydraAdmin = new AdminApi(
   new HydraConfiguration({
     basePath: hydraAdminUrl,
