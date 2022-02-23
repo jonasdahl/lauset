@@ -14,20 +14,21 @@ services:
         source: ./config
         target: /etc/config/kratos
     command: migrate sql -e --yes
-    restart: on-failure
-    networks:
-      - intranet
 
   kratos:
     depends_on:
       - kratos-migrate
-    image: oryd/kratos:v0.8.2
+    #image: oryd/kratos:v0.8.2
+    build:
+      context: ./kratos
+      dockerfile: ./.docker/Dockerfile-build
     ports:
       - "4433:4433" # public
       - "4434:4434" # admin
     restart: unless-stopped
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true
+      - KRATOS_ADMIN_URL=http://localhost:4434
       # - LOG_LEVEL=debug
     command: serve -c /etc/config/kratos/kratos.yml --dev --watch-courier
     volumes:
@@ -38,11 +39,12 @@ services:
       - type: bind
         source: ./config
         target: /etc/config/kratos
-    networks:
-      - intranet
 
   hydra-migrate:
-    image: oryd/hydra:v1.10.7-sqlite
+    # image: oryd/hydra:v1.11.5
+    build:
+      context: ./hydra
+      dockerfile: ./.docker/Dockerfile-build
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true&mode=rwc
     volumes:
@@ -55,13 +57,14 @@ services:
         target: /etc/config/hydra
     command: migrate sql -e --yes
     restart: on-failure
-    networks:
-      - intranet
 
   hydra:
     depends_on:
       - hydra-migrate
-    image: oryd/hydra:v1.10.7-sqlite
+    # image: oryd/hydra:v1.11.5
+    build:
+      context: ./hydra
+      dockerfile: ./.docker/Dockerfile-build
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true&mode=rwc
       - HYDRA_URL=http://localhost:4445/
@@ -79,62 +82,56 @@ services:
         target: /etc/config/hydra
     command: -c /etc/config/hydra/hydra.yml serve all --dangerous-force-http
     restart: on-failure
-    networks:
-      - intranet
 
   mailslurper:
     image: oryd/mailslurper:latest-smtps
     ports:
       - "4436:4436"
       - "4437:4437"
-    networks:
-      - intranet
 
   #  alias hydra="docker-compose exec hydra hydra"
 
-  #    hydra clients create \
+  #  hydra clients create \
   #    --id secure-app \
   #    --secret secure-app \
-  #    --grant-types client_credentials
-  #    --scope oidc,email,profile
+  #    --grant-types authorization_code \
+  #    --scope openid,email,profile \
+  #    --token-endpoint-auth-method client_secret_post \
   #    --callbacks http://localhost:4180/oauth2/callback
 
-  #    hydra clients create \
-  #    --id auth-code-client \
-  #    --secret secret \
-  #    --grant-types authorization_code,refresh_token \
-  #    --response-types code,id_token \
-  #    --scope openid,offline \
-  #    --callbacks http://127.0.0.1:5555/callback
 
   secure-app:
     image: quay.io/oauth2-proxy/oauth2-proxy:latest
     ports:
-      - 4180:4180
+      - "4180:4180"
     volumes:
       - type: bind
         source: ./www
         target: /www
     # https://hydra:4444/.well-known/openid-configuration
+    #   --skip-oidc-discovery
+    #   --oidc-issuer-url=http://hydra:4444/
     #   --login-url http://localhost:4444/oauth2/auth
-    #   --oidc-jwks-url http://localhost:4444/.well-known/jwks.json
-    #   --profile-url http://localhost:4444/userinfo
-    #   --redeem-url http://localhost:4444/oauth2/token
+    #   --oidc-jwks-url http://hydra:4444/.well-known/jwks.json
+    #   --profile-url http://hydra:4444/userinfo
+    #   --redeem-url http://hydra:4444/oauth2/token
     command: |
+      --http-address=0.0.0.0:4180
       --upstream=file:///www/static#/
       --client-id=secure-app
       --client-secret=secure-app
       --cookie-secret=VOT5eQoY4rdUcXFqnyKk_fcBfTbSFZ0Z_WsVbNa4oyw=
       --email-domain=*
-      --oidc-issuer-url=http://localhost:4444/
       --redirect-url=http://localhost:4180/oauth2/callback
+      --skip-oidc-discovery
+      --oidc-issuer-url=http://hydra:4444/
+      --login-url http://localhost:4444/oauth2/auth
+      --oidc-jwks-url http://hydra:4444/.well-known/jwks.json
+      --profile-url http://hydra:4444/userinfo
+      --redeem-url http://hydra:4444/oauth2/token
       --prompt=consent
       --provider=oidc
     restart: on-failure
-    network_mode: host
-
-networks:
-  intranet:
 
 volumes:
   kratos-sqlite:
