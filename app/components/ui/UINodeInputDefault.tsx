@@ -12,6 +12,7 @@ export function UINodeInputDefault(
   props: { attributes: UiNodeInputAttributes } & UiNode
 ) {
   const { attributes, messages } = props;
+
   return (
     <FormControl
       isRequired={attributes.required}

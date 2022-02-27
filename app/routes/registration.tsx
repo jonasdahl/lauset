@@ -1,4 +1,4 @@
-import { Center } from "@chakra-ui/react";
+import { Box, Center, Container, useColorModeValue } from "@chakra-ui/react";
 import { SelfServiceRegistrationFlow } from "@ory/client";
 import { LoaderFunction, useLoaderData } from "remix";
 import { BasicUI } from "~/components/BasicUI";
@@ -16,14 +16,29 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function SignUp() {
   const flow = useLoaderData<SelfServiceRegistrationFlow>();
   return (
-    <BasicUI
-      heading="Create an account"
-      ui={flow.ui}
-      footer={
-        <Center>
-          <Link href="/login">Sign in</Link>
-        </Center>
-      }
-    />
+    <Box
+      minH="100%"
+      backgroundColor="#4158D0"
+      backgroundImage="linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)"
+      py={16}
+    >
+      <Container
+        borderRadius="lg"
+        boxShadow="lg"
+        backgroundColor={useColorModeValue("white", "gray.800")}
+      >
+        <BasicUI
+          heading="Create an account"
+          ui={flow.ui}
+          footer={
+            <Center>
+              <Link fontSize="sm" opacity={0.8} href="/login">
+                Sign in
+              </Link>
+            </Center>
+          }
+        />
+      </Container>
+    </Box>
   );
 }

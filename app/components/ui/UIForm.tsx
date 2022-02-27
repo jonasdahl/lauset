@@ -17,6 +17,7 @@ import { UINodeInputHidden } from "./UINodeInputHidden";
 import { UINodeScript } from "./UINodeScript";
 import { UINodeText } from "./UINodeText";
 import { groupBy } from "lodash";
+import { UINodeInputTotp } from "./UINodeInputTotp";
 
 export function UIForm({
   ui,
@@ -94,6 +95,15 @@ function UINode({ node: { attributes, ...rest } }: { node: UiNode }) {
 
 function UINodeInput(props: { attributes: UiNodeInputAttributes } & UiNode) {
   const key = props.attributes.name;
+
+  if (
+    props.attributes.name === "totp_code" &&
+    props.attributes.node_type === "input" &&
+    props.attributes.type === "text"
+  ) {
+    return <UINodeInputTotp key={key} {...props} />;
+  }
+
   switch (props.attributes.type) {
     case "hidden":
       return <UINodeInputHidden key={key} {...props} />;
@@ -103,7 +113,8 @@ function UINodeInput(props: { attributes: UiNodeInputAttributes } & UiNode) {
       return <UINodeInputButton key={key} {...props} />;
     case "checkbox":
       return <UINodeInputCheckbox key={key} {...props} />;
-    default:
+    default: {
       return <UINodeInputDefault key={key} {...props} />;
+    }
   }
 }

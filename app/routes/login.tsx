@@ -11,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { SelfServiceLoginFlow } from "@ory/kratos-client";
 import { Link } from "~/components/Link";
-import { json, LoaderFunction, redirect, useLoaderData } from "remix";
+import { json, LoaderFunction, useLoaderData } from "remix";
 import { UIForm } from "~/components/ui/UIForm";
 import { getFlowOrRedirectToInit } from "~/utils/flow";
 import {
@@ -22,7 +22,9 @@ import {
 import { Messages } from "~/components/Messages";
 
 type LoaderData = SelfServiceLoginFlow & {
-  register_url: string;
+  isAuthenticated: boolean;
+  registerUrl: string;
+  logoutUrl: string;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -36,7 +38,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     new URL(request.url).searchParams.get("return_to") ?? ""
   ).toString();
 
-  const register_url = getUrlForKratosFlow(
+  const registerUrl = getUrlForKratosFlow(
     kratosBrowserUrl,
     "registration",
     new URLSearchParams({ return_to })
@@ -44,16 +46,20 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const isAuthenticated = login.refresh || login.requested_aal === "aal2";
 
-  if (isAuthenticated) {
-    throw redirect("/welcome");
-  }
+  const logoutUrl =
+    (await kratosSdk
+      .createSelfServiceLogoutFlowUrlForBrowsers(request.headers.get("Cookie")!)
+      .then((r) => r.data.logout_url)
+      .catch(() => "")) ?? "";
 
   return json<LoaderData>(
     {
       ...login,
-      register_url,
-    },
-    { headers: { "Cache-Control": "max-age=10" } }
+      isAuthenticated,
+      registerUrl,
+      logoutUrl,
+    }
+    // { headers: { "Cache-Control": "max-age=5" } }
   );
 };
 
@@ -75,8 +81,8 @@ export default function Login() {
         borderRadius="lg"
         boxShadow="lg"
       >
-        <Stack pt={3}>
-          <Heading as="h1" size="lg">
+        <Stack>
+          <Heading as="h1">
             {data.refresh
               ? "Confirm Action"
               : data.requested_aal === "aal2"
@@ -95,15 +101,23 @@ export default function Login() {
 
           <Divider />
 
-          <HStack>
-            <Link fontSize="sm" opacity={0.8} href={data.register_url}>
-              Sign up
-            </Link>
-            <Spacer />
-            <Link fontSize="sm" opacity={0.8} to="/recovery">
-              Recover lost credentials
-            </Link>
-          </HStack>
+          {data.isAuthenticated ? (
+            <Center>
+              <Link fontSize="sm" opacity={0.8} href={data.logoutUrl}>
+                Log out
+              </Link>
+            </Center>
+          ) : (
+            <HStack>
+              <Link fontSize="sm" opacity={0.8} href={data.registerUrl}>
+                Sign up
+              </Link>
+              <Spacer />
+              <Link fontSize="sm" opacity={0.8} to="/recovery">
+                Recover lost credentials
+              </Link>
+            </HStack>
+          )}
         </Stack>
       </Container>
     </Box>
