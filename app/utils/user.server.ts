@@ -4,7 +4,7 @@ import { isDefined } from "./is-defined";
 
 const nameType = z.object({ name: z.string() });
 const firstLastNameType = z.object({
-  name: z.object({ first: z.string().optional(), last: z.string().optional() }),
+  name: z.object({ first: z.string(), last: z.string() }),
 });
 
 export async function getUserFullName(session: Session) {

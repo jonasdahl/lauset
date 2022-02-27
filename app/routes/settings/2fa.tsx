@@ -1,4 +1,4 @@
-import { Heading, Stack } from "@chakra-ui/react";
+import { Box, Heading, Stack, Text } from "@chakra-ui/react";
 import { SelfServiceSettingsFlow } from "@ory/kratos-client";
 import { json, LoaderFunction, useLoaderData } from "remix";
 import { Messages } from "~/components/Messages";
@@ -11,7 +11,7 @@ type LoaderData = SelfServiceSettingsFlow;
 
 export const loader: LoaderFunction = async ({ request }) => {
   const session = await getSession(request.headers.get("Cookie"));
-  session.flash("settingsFlowRedirect", "/settings/password");
+  session.flash("settingsFlowRedirect", "/settings/2fa");
   const newCookie = await commitSession(session);
 
   return json<LoaderData>(
@@ -37,10 +37,27 @@ export default function ProfileSettings() {
   return (
     <Stack>
       <Heading as="h1" size="lg">
-        Change Password
+        Manage 2FA
       </Heading>
       <Messages messages={data.ui.messages} />
-      <UIForm ui={data.ui} only={["password"]} showEmpty />
+      <UIForm ui={data.ui} only={["totp"]} showEmpty />
+
+      <Box h={6} />
+      <UIForm
+        ui={data.ui}
+        only={["lookup_secret"]}
+        before={
+          <>
+            <Heading as="h3" fontSize="xl">
+              Manage 2FA Backup Recovery Codes
+            </Heading>
+            <Text>
+              Recovery codes can be used in panic situations where you have lost
+              access to your 2FA device.
+            </Text>
+          </>
+        }
+      />
     </Stack>
   );
 }

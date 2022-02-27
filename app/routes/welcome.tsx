@@ -20,6 +20,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import {
+  faEllipsisH,
   faRotate,
   faUser,
   faWallet,
@@ -74,71 +75,100 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function Welcome() {
-  const { logoutUrl, userInfo, gravatarHash, userId, userFullName } =
+  const { logoutUrl, userInfo, gravatarHash, userFullName } =
     useLoaderData<LoaderData>();
 
   return (
-    <VStack spacing={5}>
-      <Tooltip label="Change your avatar on gravatar.com">
-        <Avatar
-          src={
-            gravatarHash
-              ? `https://www.gravatar.com/avatar/${gravatarHash}.jpg`
-              : undefined
-          }
-          size="xl"
-        />
-      </Tooltip>
+    <Container maxW="container.xl">
+      <VStack spacing={5}>
+        <Tooltip label="Change your avatar on gravatar.com">
+          <Avatar
+            src={
+              gravatarHash
+                ? `https://www.gravatar.com/avatar/${gravatarHash}.jpg`
+                : undefined
+            }
+            size="xl"
+          />
+        </Tooltip>
 
-      <Heading as="h1" color="white" textAlign="center" maxW="30rem">
-        Welcome, {userFullName}
-      </Heading>
+        <Heading as="h1" color="white" textAlign="center">
+          Welcome, {userFullName}
+        </Heading>
 
-      <Container
-        maxW="container.lg"
-        bg={useColorModeValue("white", "gray.800")}
-        borderRadius="lg"
-        boxShadow="lg"
-        p={6}
-      >
-        <Stack spacing={5}>
-          <Heading size="md">Account settings</Heading>
-          <Grid templateColumns="repeat(3, 1fr)">
-            <MenuItem
-              icon={faUser}
-              href="/settings/profile"
-              label="User profile"
-            />
-            <MenuItem
-              icon={faRotate}
-              href="/settings/password"
-              label="Change password"
-            />
-            <MenuItem icon={faWallet} href="/settings/2fa" label="Manage 2FA" />
-          </Grid>
-          <Stack>
-            <UIScreenButton href="/settings">Account settings</UIScreenButton>
-            <UIScreenButton href="/verification">Verify account</UIScreenButton>
-            <UIScreenButton href={logoutUrl}>Logout</UIScreenButton>
-
-            <Accordion allowMultiple>
-              <AccordionItem border="none">
-                <AccordionButton as={Button}>
-                  <h2>
-                    <AccordionIcon /> Session information
-                  </h2>
-                </AccordionButton>
-                <AccordionPanel>
-                  <Code as="pre" p={4}>
-                    {JSON.stringify(userInfo, null, 2)}
-                  </Code>
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
+        <Container
+          maxW="container.lg"
+          bg={useColorModeValue("white", "gray.800")}
+          borderRadius="lg"
+          boxShadow="lg"
+          p={6}
+        >
+          <Stack spacing={5}>
+            <Heading size="md">Account settings</Heading>
+            <Grid
+              templateColumns={{
+                base: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(4, 1fr)",
+              }}
+            >
+              <MenuItem
+                icon={faUser}
+                href="/settings/profile"
+                label="User profile"
+              />
+              <MenuItem
+                icon={faRotate}
+                href="/settings/password"
+                label="Change password"
+              />
+              <MenuItem
+                icon={faWallet}
+                href="/settings/2fa"
+                label="Manage 2FA"
+              />
+              <MenuItem
+                icon={faEllipsisH}
+                href="/settings/other"
+                label="Other settings"
+              />
+            </Grid>
           </Stack>
-        </Stack>
-      </Container>
-    </VStack>
+        </Container>
+
+        <Container
+          maxW="container.lg"
+          bg={useColorModeValue("white", "gray.800")}
+          borderRadius="lg"
+          boxShadow="lg"
+          p={6}
+        >
+          <Stack spacing={5}>
+            <Stack>
+              <UIScreenButton href="/verification">
+                Verify account
+              </UIScreenButton>
+              <UIScreenButton href={logoutUrl}>Logout</UIScreenButton>
+
+              <Accordion allowMultiple>
+                <AccordionItem border="none">
+                  <AccordionButton as={Button}>
+                    <h2>
+                      <AccordionIcon /> Session information
+                    </h2>
+                  </AccordionButton>
+                  <AccordionPanel>
+                    <Code as="pre" p={4} overflowX="auto" maxW="100%">
+                      {JSON.stringify(userInfo, null, 2)}
+                    </Code>
+                  </AccordionPanel>
+                </AccordionItem>
+              </Accordion>
+            </Stack>
+          </Stack>
+        </Container>
+      </VStack>
+    </Container>
   );
 }
 
@@ -153,7 +183,11 @@ function MenuItem({
 }) {
   return (
     <GridItem>
-      <LinkBox>
+      <LinkBox
+        _hover={{ bg: "rgba(125,125,125,0.1)" }}
+        py={3}
+        borderRadius="md"
+      >
         <VStack textAlign="center">
           <Box fontSize="5xl">
             <FontAwesomeIcon icon={icon} />

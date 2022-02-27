@@ -4,34 +4,38 @@ import {
   Heading,
   HStack,
   Stack,
+  Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { json, LoaderFunction, Outlet, useLoaderData } from "remix";
+import { Session } from "@ory/kratos-client";
+import md5 from "md5";
+import { json, Link, LoaderFunction, Outlet, useLoaderData } from "remix";
+import { kratosSdk } from "~/utils/ory.server";
 
 type LoaderData = { gravatarHash: string | null; userFullName: string };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  // const cookie = request.headers.get("cookie") ?? undefined;
+  const cookie = request.headers.get("cookie") ?? undefined;
 
-  // let userInfo: Session | null = null;
-  // if (cookie?.includes("session")) {
-  //   const { data } = await kratosSdk
-  //     .toSession(undefined, cookie)
-  //     .catch(() => ({ data: null }));
-  //   userInfo = data;
-  // }
+  let userInfo: Session | null = null;
+  if (cookie?.includes("session")) {
+    const { data } = await kratosSdk
+      .toSession(undefined, cookie)
+      .catch(() => ({ data: null }));
+    userInfo = data;
+  }
 
   // if (!userInfo) {
   //   throw redirect("/welcome");
   // }
 
-  // const userId = userInfo.identity.verifiable_addresses?.[0]?.value ?? null;
-  // const gravatarHash = userId ? md5(userId.toLowerCase()) : null;
+  const userId = userInfo?.identity.verifiable_addresses?.[0]?.value ?? null;
+  const gravatarHash = userId ? md5(userId.toLowerCase()) : null;
 
   // console.log({ gravatarHash });
 
   return json<LoaderData>({
-    gravatarHash: null,
+    gravatarHash,
     userFullName: "Jonas Dahl", // await getUserFullName(userInfo),
   });
 };
@@ -52,7 +56,7 @@ export default function Settings() {
           />
 
           <Heading as="h1" color="white" textAlign="center" maxW="30rem">
-            {userFullName}
+            <Link to="/welcome">{userFullName}</Link>
           </Heading>
         </HStack>
 
@@ -64,6 +68,12 @@ export default function Settings() {
         >
           <Outlet />
         </Container>
+
+        <Link to="/welcome">
+          <Text as="span" color="#fff">
+            Go back
+          </Text>
+        </Link>
       </Stack>
     </Container>
   );

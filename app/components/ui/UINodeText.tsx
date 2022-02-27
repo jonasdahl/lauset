@@ -8,8 +8,8 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import { getNodeLabel } from "@ory/integrations/ui";
-import { range } from "lodash";
 import { UiNode, UiNodeTextAttributes } from "@ory/kratos-client";
+import { range } from "lodash";
 
 export function UINodeText(
   props: { attributes: UiNodeTextAttributes } & UiNode
@@ -34,7 +34,11 @@ function Content({
     case LOOKUP_SECRET_TEXT_ID:
       return <LookupSecret {...(attributes.text.context as any)} />;
     default:
-      return <Code>{attributes.text.text}</Code>;
+      return (
+        <Code p={4} borderRadius="md">
+          {attributes.text.text}
+        </Code>
+      );
   }
 }
 
