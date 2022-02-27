@@ -1,4 +1,4 @@
-import { Box, ChakraProvider, useColorModeValue } from "@chakra-ui/react";
+import { Box, ChakraProvider } from "@chakra-ui/react";
 import { withEmotionCache } from "@emotion/react";
 import { useContext, useEffect } from "react";
 import type { MetaFunction } from "remix";
@@ -10,9 +10,9 @@ import {
   Scripts,
   ScrollRestoration,
 } from "remix";
+import { env } from "./config.client";
 import ClientStyleContext from "./context.client";
 import ServerStyleContext from "./context.server";
-import { env } from "./config.client";
 
 export const meta: MetaFunction = () => {
   return { title: "Authentication" };
@@ -54,7 +54,14 @@ const App = withEmotionCache((_, emotionCache) => {
       </head>
       <body style={{ height: "100%" }}>
         <ChakraProvider>
-          <Outlet />
+          <Box
+            minH="100%"
+            backgroundColor="#4158D0"
+            backgroundImage="linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)"
+            py={16}
+          >
+            <Outlet />
+          </Box>
         </ChakraProvider>
         <ScrollRestoration />
         <Scripts />
