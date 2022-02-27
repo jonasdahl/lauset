@@ -10,8 +10,9 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { SelfServiceLoginFlow } from "@ory/kratos-client";
-import { Link } from "~/components/Link";
 import { json, LoaderFunction, useLoaderData } from "remix";
+import { Link } from "~/components/Link";
+import { Messages } from "~/components/Messages";
 import { UIForm } from "~/components/ui/UIForm";
 import { getFlowOrRedirectToInit } from "~/utils/flow";
 import {
@@ -19,7 +20,6 @@ import {
   kratosBrowserUrl,
   kratosSdk,
 } from "~/utils/ory.server";
-import { Messages } from "~/components/Messages";
 
 type LoaderData = SelfServiceLoginFlow & {
   isAuthenticated: boolean;
@@ -67,59 +67,49 @@ export default function Login() {
   const data = useLoaderData<LoaderData>();
 
   return (
-    <Box
-      minH="100%"
-      backgroundColor="#4158D0"
-      backgroundImage="linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)"
-      py={16}
+    <Container
+      py={7}
+      p={6}
+      maxW="20rem"
+      bg={useColorModeValue("white", "gray.800")}
+      borderRadius="lg"
+      boxShadow="lg"
     >
-      <Container
-        py={7}
-        p={6}
-        maxW="20rem"
-        bg={useColorModeValue("white", "gray.800")}
-        borderRadius="lg"
-        boxShadow="lg"
-      >
-        <Stack>
-          <Heading as="h1">
-            {data.refresh
-              ? "Confirm Action"
-              : data.requested_aal === "aal2"
-              ? "Two-Factor Authentication"
-              : "Sign In"}
-          </Heading>
+      <Stack>
+        <Heading as="h1">
+          {data.refresh
+            ? "Confirm Action"
+            : data.requested_aal === "aal2"
+            ? "Two-Factor Authentication"
+            : "Sign In"}
+        </Heading>
 
-          <Messages
-            messages={data.ui.messages}
-            alertProps={{ fontSize: "xs" }}
-          />
+        <Messages messages={data.ui.messages} alertProps={{ fontSize: "xs" }} />
 
-          <Box pb={3}>
-            <UIForm ui={data.ui} />
-          </Box>
+        <Box pb={3}>
+          <UIForm ui={data.ui} />
+        </Box>
 
-          <Divider />
+        <Divider />
 
-          {data.isAuthenticated ? (
-            <Center>
-              <Link fontSize="sm" opacity={0.8} href={data.logoutUrl}>
-                Log out
-              </Link>
-            </Center>
-          ) : (
-            <HStack>
-              <Link fontSize="sm" opacity={0.8} href={data.registerUrl}>
-                Sign up
-              </Link>
-              <Spacer />
-              <Link fontSize="sm" opacity={0.8} to="/recovery">
-                Recover lost credentials
-              </Link>
-            </HStack>
-          )}
-        </Stack>
-      </Container>
-    </Box>
+        {data.isAuthenticated ? (
+          <Center>
+            <Link fontSize="sm" opacity={0.8} href={data.logoutUrl}>
+              Log out
+            </Link>
+          </Center>
+        ) : (
+          <HStack>
+            <Link fontSize="sm" opacity={0.8} href={data.registerUrl}>
+              Sign up
+            </Link>
+            <Spacer />
+            <Link fontSize="sm" opacity={0.8} to="/recovery">
+              Recover lost credentials
+            </Link>
+          </HStack>
+        )}
+      </Stack>
+    </Container>
   );
 }

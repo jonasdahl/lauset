@@ -1,126 +1,79 @@
-import { Center, Container, Heading, Stack, Text } from "@chakra-ui/react";
-import { SelfServiceSettingsFlow } from "@ory/kratos-client";
-import { Link, LoaderFunction, useLoaderData } from "remix";
-import { Messages } from "~/components/Messages";
-import { UIForm } from "~/components/ui/UIForm";
-import { getFlowOrRedirectToInit } from "~/utils/flow";
+import {
+  Avatar,
+  Container,
+  Heading,
+  HStack,
+  Stack,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
+import { Session } from "@ory/kratos-client";
+import md5 from "md5";
+import { json, Link, LoaderFunction, Outlet, useLoaderData } from "remix";
 import { kratosSdk } from "~/utils/ory.server";
 
+type LoaderData = { gravatarHash: string | null; userFullName: string };
+
 export const loader: LoaderFunction = async ({ request }) => {
-  return getFlowOrRedirectToInit(request, "settings", (flow, cookie) =>
-    kratosSdk.getSelfServiceSettingsFlow(flow, undefined, cookie)
-  );
+  const cookie = request.headers.get("cookie") ?? undefined;
+
+  let userInfo: Session | null = null;
+  if (cookie?.includes("session")) {
+    const { data } = await kratosSdk
+      .toSession(undefined, cookie)
+      .catch(() => ({ data: null }));
+    userInfo = data;
+  }
+
+  // if (!userInfo) {
+  //   throw redirect("/welcome");
+  // }
+
+  const userId = userInfo?.identity.verifiable_addresses?.[0]?.value ?? null;
+  const gravatarHash = userId ? md5(userId.toLowerCase()) : null;
+
+  // console.log({ gravatarHash });
+
+  return json<LoaderData>({
+    gravatarHash,
+    userFullName: "Jonas Dahl", // await getUserFullName(userInfo),
+  });
 };
 
-export default function Verification() {
-  const data = useLoaderData<SelfServiceSettingsFlow>();
+export default function Settings() {
+  const { gravatarHash, userFullName } = useLoaderData<LoaderData>();
 
   return (
-    <Container py={7}>
-      <Stack>
-        <Heading as="h1">Profile Management and Security Settings</Heading>
-        <Messages messages={data.ui.messages} />
+    <Container>
+      <Stack spacing={5}>
+        <HStack>
+          <Avatar
+            src={
+              gravatarHash
+                ? `https://www.gravatar.com/avatar/${gravatarHash}.jpg`
+                : undefined
+            }
+          />
 
-        <UIForm
-          ui={data.ui}
-          only={["profile"]}
-          before={
-            <Heading as="h3" fontSize="xl">
-              Profile Settings
-            </Heading>
-          }
-          showEmpty
-        />
+          <Heading as="h1" color="white" textAlign="center" maxW="30rem">
+            <Link to="/welcome">{userFullName}</Link>
+          </Heading>
+        </HStack>
 
-        <UIForm
-          ui={data.ui}
-          only={["password"]}
-          before={
-            <Heading as="h3" fontSize="xl">
-              Change password
-            </Heading>
-          }
-        />
+        <Container
+          p={6}
+          bg={useColorModeValue("white", "gray.800")}
+          borderRadius="lg"
+          boxShadow="lg"
+        >
+          <Outlet />
+        </Container>
 
-        <UIForm
-          ui={data.ui}
-          only={["oidc"]}
-          before={
-            <Heading as="h3" fontSize="xl">
-              Manage Social Sign In
-            </Heading>
-          }
-        />
-
-        <UIForm
-          ui={data.ui}
-          only={["lookup_secret"]}
-          before={
-            <>
-              <Heading as="h3" fontSize="xl">
-                Manage 2FA Backup Recovery Codes
-              </Heading>
-              <Text>
-                Recovery codes can be used in panic situations where you have
-                lost access to your 2FA device.
-              </Text>
-            </>
-          }
-        />
-
-        <UIForm
-          ui={data.ui}
-          only={["totp"]}
-          before={
-            <>
-              <Heading as="h3" fontSize="xl">
-                Manage 2FA TOTP Authenticator App
-              </Heading>
-              <Text>
-                Add a TOTP Authenticator App to your account to improve your
-                account security. Popular Authenticator Apps are{" "}
-                <Link to="https://www.lastpass.com" target="_blank">
-                  LastPass
-                </Link>{" "}
-                and Google Authenticator (
-                <Link
-                  to="https://apps.apple.com/us/app/google-authenticator/id388497605"
-                  target="_blank"
-                >
-                  iOS
-                </Link>
-                ,
-                <Link
-                  to="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en&gl=US"
-                  target="_blank"
-                >
-                  Android
-                </Link>
-                ).
-              </Text>
-            </>
-          }
-        />
-
-        <UIForm
-          ui={data.ui}
-          only={["webauthn"]}
-          before={
-            <>
-              <Heading as="h3" fontSize="xl">
-                Manage Hardware Tokens and Biometrics
-              </Heading>
-              <Text>
-                Use Hardware Tokens (e.g. YubiKey) or Biometrics (e.g. FaceID,
-                TouchID) to enhance your account security.
-              </Text>
-            </>
-          }
-        />
-
-        <Center>
-          <Link to="/">Go back</Link>
-        </Center>
+        <Link to="/welcome">
+          <Text as="span" color="#fff">
+            Go back
+          </Text>
+        </Link>
       </Stack>
     </Container>
   );

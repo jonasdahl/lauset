@@ -8,16 +8,16 @@ import {
   isUiNodeTextAttributes,
 } from "@ory/integrations/ui";
 import { UiContainer, UiNode, UiNodeInputAttributes } from "@ory/kratos-client";
+import { groupBy } from "lodash";
 import { UINodeAnchor } from "./UINodeAnchor";
 import { UINodeImage } from "./UINodeImage";
 import { UINodeInputButton } from "./UINodeInputButton";
 import { UINodeInputCheckbox } from "./UINodeInputCheckbox";
 import { UINodeInputDefault } from "./UINodeInputDefault";
 import { UINodeInputHidden } from "./UINodeInputHidden";
+import { UINodeInputTotp } from "./UINodeInputTotp";
 import { UINodeScript } from "./UINodeScript";
 import { UINodeText } from "./UINodeText";
-import { groupBy } from "lodash";
-import { UINodeInputTotp } from "./UINodeInputTotp";
 
 export function UIForm({
   ui,
@@ -42,8 +42,8 @@ export function UIForm({
       {before}
       {Object.values(
         groupBy(filterNodesByGroups(ui.nodes, only, true), (n) => n.group)
-      ).map((nodes) => (
-        <form action={ui.action} method={ui.method}>
+      ).map((nodes, i) => (
+        <form key={i} action={ui.action} method={ui.method}>
           <Stack>
             {ui.nodes
               .filter((n) => n.group === "default")

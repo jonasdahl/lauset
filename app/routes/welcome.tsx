@@ -7,28 +7,40 @@ import {
   Avatar,
   Box,
   Button,
-  Center,
   Code,
-  Collapse,
   Container,
+  Grid,
+  GridItem,
   Heading,
-  HStack,
-  Image,
-  Spacer,
+  LinkBox,
+  LinkOverlay,
   Stack,
-  Text,
+  Tooltip,
+  useColorModeValue,
+  VStack,
 } from "@chakra-ui/react";
+import {
+  faEllipsisH,
+  faRotate,
+  faUser,
+  faWallet,
+  IconDefinition,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Session } from "@ory/kratos-client";
 import md5 from "md5";
-import { json, LoaderFunction, redirect, useLoaderData } from "remix";
+import { forwardRef } from "react";
+import { json, Link, LoaderFunction, redirect, useLoaderData } from "remix";
 import { UIScreenButton } from "~/components/ui/UIScreenButton";
 import { kratosSdk } from "~/utils/ory.server";
+import { getUserFullName } from "~/utils/user.server";
 
 type LoaderData = {
   logoutUrl: string;
   userInfo: Session;
   gravatarHash: string | null;
   userId: string | null;
+  userFullName: string;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -53,53 +65,142 @@ export const loader: LoaderFunction = async ({ request }) => {
   const userId = userInfo.identity.verifiable_addresses?.[0]?.value ?? null;
   const gravatarHash = userId ? md5(userId.toLowerCase()) : null;
 
-  return json<LoaderData>({ logoutUrl, userInfo, gravatarHash, userId });
+  return json<LoaderData>({
+    logoutUrl,
+    userInfo,
+    gravatarHash,
+    userId,
+    userFullName: await getUserFullName(userInfo),
+  });
 };
 
 export default function Welcome() {
-  const { logoutUrl, userInfo, gravatarHash, userId } =
+  const { logoutUrl, userInfo, gravatarHash, userFullName } =
     useLoaderData<LoaderData>();
 
   return (
-    <Container py={6}>
-      <Stack spacing={5}>
-        <HStack>
-          <Heading as="h1">Welcome</Heading>
-          <Spacer />
+    <Container maxW="container.xl">
+      <VStack spacing={5}>
+        <Tooltip label="Change your avatar on gravatar.com">
+          <Avatar
+            src={
+              gravatarHash
+                ? `https://www.gravatar.com/avatar/${gravatarHash}.jpg`
+                : undefined
+            }
+            size="xl"
+          />
+        </Tooltip>
 
-          <Box>{userId}</Box>
-          {gravatarHash ? (
-            <Avatar
-              src={
-                gravatarHash
-                  ? `https://www.gravatar.com/avatar/${gravatarHash}.jpg`
-                  : undefined
-              }
-            />
-          ) : null}
-        </HStack>
+        <Heading as="h1" color="white" textAlign="center">
+          Welcome, {userFullName}
+        </Heading>
 
-        <Stack>
-          <UIScreenButton href="/settings">Account settings</UIScreenButton>
-          <UIScreenButton href="/verification">Verify account</UIScreenButton>
-          <UIScreenButton href={logoutUrl}>Logout</UIScreenButton>
+        <Container
+          maxW="container.lg"
+          bg={useColorModeValue("white", "gray.800")}
+          borderRadius="lg"
+          boxShadow="lg"
+          p={6}
+        >
+          <Stack spacing={5}>
+            <Heading size="md">Account settings</Heading>
+            <Grid
+              templateColumns={{
+                base: "1fr",
+                sm: "repeat(2, 1fr)",
+                md: "repeat(4, 1fr)",
+              }}
+            >
+              <MenuItem
+                icon={faUser}
+                href="/settings/profile"
+                label="User profile"
+              />
+              <MenuItem
+                icon={faRotate}
+                href="/settings/password"
+                label="Change password"
+              />
+              <MenuItem
+                icon={faWallet}
+                href="/settings/2fa"
+                label="Manage 2FA"
+              />
+              <MenuItem
+                icon={faEllipsisH}
+                href="/settings/other"
+                label="Other settings"
+              />
+            </Grid>
+          </Stack>
+        </Container>
 
-          <Accordion allowMultiple>
-            <AccordionItem border="none">
-              <AccordionButton as={Button}>
-                <h2>
-                  <AccordionIcon /> Session information
-                </h2>
-              </AccordionButton>
-              <AccordionPanel>
-                <Code as="pre" p={4}>
-                  {JSON.stringify(userInfo, null, 2)}
-                </Code>
-              </AccordionPanel>
-            </AccordionItem>
-          </Accordion>
-        </Stack>
-      </Stack>
+        <Container
+          maxW="container.lg"
+          bg={useColorModeValue("white", "gray.800")}
+          borderRadius="lg"
+          boxShadow="lg"
+          p={6}
+        >
+          <Stack spacing={5}>
+            <Stack>
+              <UIScreenButton href="/verification">
+                Verify account
+              </UIScreenButton>
+              <UIScreenButton href={logoutUrl}>Logout</UIScreenButton>
+
+              <Accordion allowMultiple>
+                <AccordionItem border="none">
+                  <AccordionButton as={Button}>
+                    <h2>
+                      <AccordionIcon /> Session information
+                    </h2>
+                  </AccordionButton>
+                  <AccordionPanel>
+                    <Code as="pre" p={4} overflowX="auto" maxW="100%">
+                      {JSON.stringify(userInfo, null, 2)}
+                    </Code>
+                  </AccordionPanel>
+                </AccordionItem>
+              </Accordion>
+            </Stack>
+          </Stack>
+        </Container>
+      </VStack>
     </Container>
+  );
+}
+
+function MenuItem({
+  icon,
+  label,
+  href,
+}: {
+  href: string;
+  label: string;
+  icon: IconDefinition;
+}) {
+  return (
+    <GridItem>
+      <LinkBox
+        _hover={{ bg: "rgba(125,125,125,0.1)" }}
+        py={3}
+        borderRadius="md"
+      >
+        <VStack textAlign="center">
+          <Box fontSize="5xl">
+            <FontAwesomeIcon icon={icon} />
+          </Box>
+          <LinkOverlay
+            as={forwardRef((props, ref) => (
+              <Link to={href} {...props} ref={ref as any} prefetch="intent" />
+            ))}
+          >
+            {label}
+          </LinkOverlay>
+        </VStack>
+      </LinkBox>
+    </GridItem>
   );
 }

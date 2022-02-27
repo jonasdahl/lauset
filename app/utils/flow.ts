@@ -6,7 +6,8 @@ import { getUrlForKratosFlow, kratosBrowserUrl } from "./ory.server";
 export async function getFlowOrRedirectToInit<T>(
   request: Request,
   name: string,
-  flowGetter: (flow: string, cookie: string) => Promise<{ data: T }>
+  flowGetter: (flow: string, cookie: string) => Promise<{ data: T }>,
+  redirectHeaders?: HeadersInit
 ): Promise<T> {
   const params = new URL(request.url).searchParams;
   const flow = params.get("flow");
@@ -15,15 +16,21 @@ export async function getFlowOrRedirectToInit<T>(
   const initFlowUrl = getUrlForKratosFlow(
     kratosBrowserUrl,
     name,
-    new URLSearchParams({ return_to: return_to.toString() })
+    new URLSearchParams({
+      return_to: return_to.toString(),
+    })
   );
-  const initFlowResponse = redirect(initFlowUrl, 303);
+  const initFlowResponse = redirect(initFlowUrl, {
+    status: 303,
+    headers: redirectHeaders,
+  });
 
   if (!flow) {
     throw initFlowResponse;
   } else {
     try {
       const { data } = await flowGetter(flow, request.headers.get("Cookie")!);
+
       return data;
     } catch (e: any) {
       if (
