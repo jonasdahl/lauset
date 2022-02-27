@@ -1,15 +1,24 @@
 import { Alert, AlertIcon, Stack } from "@chakra-ui/react";
 import { UiText } from "@ory/kratos-client";
+import { ComponentProps } from "react";
 
-export function Messages({ messages }: { messages?: UiText[] }) {
+export function Messages({
+  messages,
+  alertProps,
+}: {
+  messages?: UiText[];
+  alertProps?: Omit<ComponentProps<typeof Alert>, "children">;
+}) {
   if (!messages || !messages.length) return null;
 
   return (
     <Stack>
       {messages?.map((m) => (
         <Alert
+          borderRadius="md"
           key={m.id}
           status={m.type as "success" | "info" | "warning" | "error"}
+          {...alertProps}
         >
           <AlertIcon />
           {m.text}

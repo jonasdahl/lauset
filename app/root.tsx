@@ -1,4 +1,4 @@
-import { ChakraProvider } from "@chakra-ui/react";
+import { Box, ChakraProvider, useColorModeValue } from "@chakra-ui/react";
 import { withEmotionCache } from "@emotion/react";
 import { useContext, useEffect } from "react";
 import type { MetaFunction } from "remix";
@@ -37,7 +37,7 @@ const App = withEmotionCache((_, emotionCache) => {
   }, []);
 
   return (
-    <html lang="en">
+    <html lang="en" style={{ height: "100%" }}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -52,7 +52,7 @@ const App = withEmotionCache((_, emotionCache) => {
           />
         ))}
       </head>
-      <body>
+      <body style={{ height: "100%" }}>
         <ChakraProvider>
           <Outlet />
         </ChakraProvider>

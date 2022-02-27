@@ -36,8 +36,6 @@ export function UIForm({
     return null;
   }
 
-  console.log(ui.nodes);
-
   return (
     <Stack>
       {before}

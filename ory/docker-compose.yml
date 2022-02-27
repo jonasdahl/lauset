@@ -18,10 +18,10 @@ services:
   kratos:
     depends_on:
       - kratos-migrate
-    #image: oryd/kratos:v0.8.2
-    build:
-      context: ./kratos
-      dockerfile: ./.docker/Dockerfile-build
+    image: oryd/kratos:v0.8.2
+    # build:
+    #   context: ./kratos
+    #   dockerfile: ./.docker/Dockerfile-build
     ports:
       - "4433:4433" # public
       - "4434:4434" # admin
@@ -41,10 +41,10 @@ services:
         target: /etc/config/kratos
 
   hydra-migrate:
-    # image: oryd/hydra:v1.11.5
-    build:
-      context: ./hydra
-      dockerfile: ./.docker/Dockerfile-build
+    image: oryd/hydra:v1.10.7-sqlite
+    # build:
+    #   context: ./hydra
+    #   dockerfile: ./.docker/Dockerfile-build
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true&mode=rwc
     volumes:
@@ -61,10 +61,10 @@ services:
   hydra:
     depends_on:
       - hydra-migrate
-    # image: oryd/hydra:v1.11.5
-    build:
-      context: ./hydra
-      dockerfile: ./.docker/Dockerfile-build
+    image: oryd/hydra:v1.10.7-sqlite
+    # build:
+    #   context: ./hydra
+    #   dockerfile: ./.docker/Dockerfile-build
     environment:
       - DSN=sqlite:///var/lib/sqlite/db.sqlite?_fk=true&mode=rwc
       - HYDRA_URL=http://localhost:4445/
@@ -98,7 +98,6 @@ services:
   #    --scope openid,email,profile \
   #    --token-endpoint-auth-method client_secret_post \
   #    --callbacks http://localhost:4180/oauth2/callback
-
 
   secure-app:
     image: quay.io/oauth2-proxy/oauth2-proxy:latest

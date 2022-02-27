@@ -17,10 +17,12 @@ export function UINodeInputButton(
     <Stack>
       <Box>
         <Button
+          w="100%"
           name={attributes.name}
           type={attributes.type as "button" | "submit" | "reset"}
           value={attributes.value}
           disabled={attributes.disabled}
+          colorScheme="green"
         >
           {getNodeLabel(props)}
         </Button>

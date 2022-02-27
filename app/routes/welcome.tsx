@@ -1,13 +1,14 @@
 import { Box, Code, Container, Heading, Stack, Text } from "@chakra-ui/react";
 import { Session } from "@ory/kratos-client";
-import { LoaderFunction, useLoaderData } from "remix";
-// import { getSession } from "~/sessions";
+import { json, LoaderFunction, useLoaderData } from "remix";
 import { UIScreenButton } from "~/components/ui/UIScreenButton";
 import { kratosSdk } from "~/utils/ory.server";
 
+type LoaderData = { logoutUrl: string; userInfo: Session | null };
+
 export const loader: LoaderFunction = async ({ request }) => {
   const cookie = request.headers.get("cookie") ?? undefined;
-  const { logout_url } = await kratosSdk
+  const { logout_url: logoutUrl } = await kratosSdk
     .createSelfServiceLogoutFlowUrlForBrowsers(cookie)
     .then((r) => r.data)
     .catch(() => ({ logout_url: "" }));
@@ -20,28 +21,28 @@ export const loader: LoaderFunction = async ({ request }) => {
     userInfo = data;
   }
 
-  return { logout_url, userInfo };
+  return json<LoaderData>({ logoutUrl, userInfo });
 };
 
 export default function Welcome() {
-  const { logout_url, userInfo } =
-    useLoaderData<{ logout_url: string; userInfo: Session }>();
+  const { logoutUrl, userInfo } = useLoaderData<LoaderData>();
 
   return (
     <Container py={6}>
-      <Stack>
-        <Heading as="h1">Welcome!</Heading>
+      <Stack spacing={5}>
+        <Heading as="h1">Welcome</Heading>
 
-        <Box py={3}>
-          <Heading as="h2">Session Information</Heading>
+        <Stack>
+          <Heading as="h2" size="md">
+            Session Information
+          </Heading>
           <Text>
             Below you will find the decoded Ory Session if you are logged in.
           </Text>
-
-          <Code>
-            <pre>{JSON.stringify(userInfo, null, 2)}</pre>
+          <Code as="pre" p={4}>
+            {JSON.stringify(userInfo, null, 2)}
           </Code>
-        </Box>
+        </Stack>
 
         <Stack>
           <UIScreenButton href="/login" disabled={!!userInfo}>
@@ -57,7 +58,7 @@ export default function Welcome() {
           <UIScreenButton href="/settings" disabled={!userInfo}>
             Account settings
           </UIScreenButton>
-          <UIScreenButton href={logout_url} disabled={!userInfo}>
+          <UIScreenButton href={logoutUrl} disabled={!userInfo}>
             Logout
           </UIScreenButton>
         </Stack>
