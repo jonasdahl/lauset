@@ -6,9 +6,9 @@ export const loader: LoaderFunction = async ({ request }) => {
 
   const cookie = request.headers.get("Cookie");
   const session = await getSession(cookie);
+  const sessionRedirect = session.get("settingsFlowRedirect");
   const newSession = await commitSession(session);
 
-  const sessionRedirect = session.get("settingsFlowRedirect");
   if (sessionRedirect && params.get("flow")) {
     return redirect(`${sessionRedirect}?${params.toString()}`, {
       headers: { "Set-Cookie": newSession },

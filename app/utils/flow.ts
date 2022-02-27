@@ -7,7 +7,7 @@ export async function getFlowOrRedirectToInit<T>(
   request: Request,
   name: string,
   flowGetter: (flow: string, cookie: string) => Promise<{ data: T }>,
-  redirectHeaders?: Headers
+  redirectHeaders?: HeadersInit
 ): Promise<T> {
   const params = new URL(request.url).searchParams;
   const flow = params.get("flow");

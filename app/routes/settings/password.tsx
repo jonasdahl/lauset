@@ -1,34 +1,14 @@
 import { Heading, Stack } from "@chakra-ui/react";
 import { SelfServiceSettingsFlow } from "@ory/kratos-client";
-import { json, LoaderFunction, useLoaderData } from "remix";
+import { LoaderFunction, useLoaderData } from "remix";
 import { Messages } from "~/components/Messages";
 import { UIForm } from "~/components/ui/UIForm";
-import { commitSession, getSession } from "~/sessions";
-import { getFlowOrRedirectToInit } from "~/utils/flow";
-import { kratosSdk } from "~/utils/ory.server";
+import { initSettingsFlow } from "~/utils/settings-flow.server";
 
 type LoaderData = SelfServiceSettingsFlow;
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const session = await getSession(request.headers.get("Cookie"));
-  session.flash("settingsFlowRedirect", "/settings/password");
-  const newCookie = await commitSession(session);
-
-  return json<LoaderData>(
-    await getFlowOrRedirectToInit(
-      request,
-      "settings",
-      async (flow, cookie) => {
-        return await kratosSdk.getSelfServiceSettingsFlow(
-          flow,
-          undefined,
-          cookie
-        );
-      },
-      new Headers({ "Set-Cookie": newCookie })
-    ),
-    { headers: { "Set-Cookie": newCookie } }
-  );
+  return initSettingsFlow({ request });
 };
 
 export default function ProfileSettings() {
