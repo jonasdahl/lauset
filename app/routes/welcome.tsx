@@ -15,7 +15,13 @@ import {
   LinkBox,
   LinkOverlay,
   Stack,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
   Tooltip,
+  Tr,
   useColorModeValue,
   VStack,
 } from "@chakra-ui/react";
@@ -27,7 +33,7 @@ import {
   IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Session } from "@ory/kratos-client";
+import { Identity, Session } from "@ory/kratos-client";
 import md5 from "md5";
 import { forwardRef } from "react";
 import { json, Link, LoaderFunction, redirect, useLoaderData } from "remix";
@@ -41,6 +47,7 @@ type LoaderData = {
   gravatarHash: string | null;
   userId: string | null;
   userFullName: string;
+  identities: Identity[];
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -49,6 +56,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     .createSelfServiceLogoutFlowUrlForBrowsers(cookie)
     .then((r) => r.data)
     .catch(() => ({ logout_url: "" }));
+
+  const ids = await kratosSdk.adminListIdentities(20);
+  console.log(ids.data.map((d) => d));
 
   let userInfo: Session | null = null;
   if (cookie?.includes("session")) {
@@ -70,12 +80,13 @@ export const loader: LoaderFunction = async ({ request }) => {
     userInfo,
     gravatarHash,
     userId,
+    identities: ids.data.map((d) => d),
     userFullName: await getUserFullName(userInfo),
   });
 };
 
 export default function Welcome() {
-  const { logoutUrl, userInfo, gravatarHash, userFullName } =
+  const { logoutUrl, userInfo, gravatarHash, userFullName, identities } =
     useLoaderData<LoaderData>();
 
   return (
@@ -166,6 +177,32 @@ export default function Welcome() {
               </Accordion>
             </Stack>
           </Stack>
+        </Container>
+
+        <Container
+          maxW="container.lg"
+          bg={useColorModeValue("white", "gray.800")}
+          borderRadius="lg"
+          boxShadow="lg"
+          p={6}
+        >
+          <Stack spacing={5}></Stack>
+          <Heading size="md">Identities</Heading>
+          <Table variant="unstyled">
+            <Thead>
+              <Tr>
+                <Th>ID</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {identities.map((id) => (
+                <Tr key={id.id}>
+                  <Td>{Object.values(id.traits.name).join(" ")}</Td>
+                  <Td>{id.traits.email}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
         </Container>
       </VStack>
     </Container>
