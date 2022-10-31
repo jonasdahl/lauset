@@ -1,11 +1,8 @@
 import {
-  AdminApi,
+  OAuth2Api,
   Configuration as HydraConfiguration,
 } from "@ory/hydra-client";
-import {
-  Configuration as KratosConfiguration,
-  V0alpha2Api,
-} from "@ory/kratos-client";
+import { Configuration as KratosConfiguration, V0alpha2Api } from "@ory/client";
 import { env } from "~/config.server";
 
 export const kratosPublicUrl = env.KRATOS_PUBLIC_URL;
@@ -18,7 +15,7 @@ export const kratosSdk = new V0alpha2Api(
 );
 
 export const hydraAdminUrl = env.HYDRA_ADMIN_URL;
-export const hydraAdmin = new AdminApi(
+export const hydraOauthApi = new OAuth2Api(
   new HydraConfiguration({
     basePath: hydraAdminUrl,
   })

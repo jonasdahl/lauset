@@ -12,16 +12,15 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { OAuth2Client } from "@ory/hydra-client";
-import { Session } from "@ory/kratos-client";
+import { Session } from "@ory/client";
+import { Form, useLoaderData } from "@remix-run/react";
 import {
   ActionFunction,
-  Form,
   LoaderFunction,
   redirect,
-  useLoaderData,
-} from "remix";
+} from "@remix-run/server-runtime";
 import { Link } from "~/components/Link";
-import { hydraAdmin } from "~/utils/ory.server";
+import { hydraOauthApi } from "~/utils/ory.server";
 
 type ViewData = {
   challenge: string;
@@ -40,7 +39,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     throw new Error("Expected consent_challenge to be set.");
   }
 
-  const { data: body } = await hydraAdmin.getConsentRequest(challenge);
+  const { data: body } = await hydraOauthApi.getOAuth2ConsentRequest(challenge);
 
   const context = body.context as Session;
 
@@ -50,7 +49,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     // All we need to do now is to redirect the user back to hydra!
     const {
       data: { redirect_to },
-    } = await hydraAdmin.acceptConsentRequest(challenge, {
+    } = await hydraOauthApi.acceptOAuth2ConsentRequest(challenge, {
       // We can grant all scopes that have been requested - hydra already checked for us that no additional scopes
       // are requested accidentally.
       grant_scope: body.requested_scope,
@@ -88,7 +87,7 @@ export const action: ActionFunction = async ({ request }) => {
     // Looks like the consent request was denied by the user
     const {
       data: { redirect_to },
-    } = await hydraAdmin.rejectConsentRequest(challenge, {
+    } = await hydraOauthApi.rejectOAuth2ConsentRequest(challenge, {
       error: "access_denied",
       error_description: "The resource owner denied the request",
     });
@@ -101,11 +100,11 @@ export const action: ActionFunction = async ({ request }) => {
   }
 
   // Seems like the user authenticated! Let's tell hydra...
-  const { data: body } = await hydraAdmin.getConsentRequest(challenge);
+  const { data: body } = await hydraOauthApi.getOAuth2ConsentRequest(challenge);
 
   const {
     data: { redirect_to },
-  } = await hydraAdmin.acceptConsentRequest(challenge, {
+  } = await hydraOauthApi.acceptOAuth2ConsentRequest(challenge, {
     // We can grant all scopes that have been requested - hydra already checked for us that no additional scopes
     // are requested accidentally.
     grant_scope: grantScope,

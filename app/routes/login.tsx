@@ -9,8 +9,9 @@ import {
   Stack,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { SelfServiceLoginFlow } from "@ory/kratos-client";
-import { json, LoaderFunction, useLoaderData } from "remix";
+import { SelfServiceLoginFlow } from "@ory/client";
+import { useLoaderData } from "@remix-run/react";
+import { json, LoaderFunction } from "@remix-run/server-runtime";
 import { Link } from "~/components/Link";
 import { Messages } from "~/components/Messages";
 import { UIForm } from "~/components/ui/UIForm";
